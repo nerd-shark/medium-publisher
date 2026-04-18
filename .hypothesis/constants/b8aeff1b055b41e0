@@ -1,0 +1,4 @@
+# file: C:\Users\3717246\Repos\Medium\medium_publisher\safety\emergency_stop.py
+# hypothesis_version: 6.148.2
+
+['+', '<alt>', '<ctrl>', '<enter>', '<esc>', '<shift>', '<space>', '<tab>', 'Automation paused', 'Automation resumed', 'Emergency stop reset', 'alt', 'ctrl', 'ctrl+shift+escape', 'enter', 'esc', 'escape', 'shift', 'space', 'tab', 'win']

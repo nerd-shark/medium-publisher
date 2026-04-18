@@ -1,0 +1,22 @@
+# Featured Image Prompts — The Promise/Work Pattern
+
+## Prompt 1: The Orchestrator Command Center
+A futuristic control room illustration with a central figure — a glowing humanoid AI orchestrator standing at a large circular holographic console. The console displays a dependency graph (DAG) of connected work units, some glowing green (completed), some amber (in progress), some red (failed, being rerouted). Around the perimeter, multiple smaller robotic worker agents stand at individual stations, each with a glowing capability badge on their chest showing their specialization. The orchestrator's hands move over the console, routing a red work unit away from one agent toward another agent whose badge pulses brighter — indicating better edge case performance. Overhead, a large Promise beacon tracks overall progress at 78%. Style: sci-fi control room, clean, dark background with glowing holographic elements. 16:9 landscape. No text, no labels.
+
+## Prompt 2: The Reconciliation Loop with Brain
+A futuristic illustration showing a large circular holographic display in the center of a dark room. The display shows a continuous loop — a glowing ring with arrows indicating clockwise flow. At the top of the ring, "Desired State" glows gold. At the bottom, "Actual State" glows blue, with a gap the loop is actively closing. But now, at the center of the ring, a glowing brain-like structure pulses — the orchestrator intelligence. Neural pathways extend from the brain to surrounding agent stations, each station showing a small performance dashboard (bar charts, accuracy meters). Some agents glow brighter than others, indicating the orchestrator's awareness of their strengths. Small robotic workers move between stations. Style: sci-fi control room, neural network aesthetic blended with industrial orchestration. 16:9 landscape. No text, no labels.
+
+## Prompt 3: The Assembly Line with Smart Routing
+A wide illustration of a futuristic automated assembly line with multiple parallel tracks. Each track has small robotic agents working on glowing data cubes (work units). Most tracks flow smoothly left to right. One track has a broken station — a robot has crashed, sparks flying. But instead of the whole line stopping, a central elevated platform holds a larger, more sophisticated robot — the orchestrator — who surveys all tracks simultaneously. The orchestrator's arm extends, redirecting the stuck cube not to the nearest backup track, but to a specific track where the agent has a glowing gold badge indicating specialist capability. A second cube, glowing with an ambiguous purple hue (edge case), is being simultaneously routed to three different tracks for consensus comparison. Overhead display shows Promise progress at 78%. Style: industrial-futuristic, clean lines, dramatic lighting on the orchestrator's routing decisions. 16:9 landscape. No text.
+
+## Prompt 4: The Team Lead
+A realistic illustration of a traditional corporate meeting room — fluorescent lighting, whiteboard, plain office chairs, a long rectangular conference table. Seated around the table are five distinct robots, each clearly showing their role through visual cues: an accountant bot wearing small round glasses and holding a calculator, an engineer bot with safety goggles pushed up on its forehead and a wrench tucked in a belt loop, a designer bot with a stylus in hand and a color palette sticker on its chest, an infrastructure bot wearing a yellow hardhat and a high-vis vest, and a manager bot wearing a necktie and standing at the head of the table. On the wall behind the manager bot, a large projected Gantt chart shows tasks in various states — green bars (done), yellow bars (in progress), red bars (blocked). The manager bot is pointing at one of the red bars on the Gantt chart and looking directly at the engineer bot, as if assigning the work. Papers and coffee cups are scattered on the table. The vibe is a mundane Monday morning standup, except everyone is a robot. Style: grounded, slightly humorous, warm office lighting, realistic meeting room setting. 16:9 landscape. No text, no labels.
+
+---
+
+## Usage Notes
+- All prompts 16:9 landscape for Medium featured images
+- No text, no labels, no readable content
+- Focus on: orchestrator intelligence, capability-aware routing, edge case handling, consensus, recovery
+- Recommended: Prompt 1 (Orchestrator Command Center) or Prompt 4 (Team Lead) for featured image
+- v4 update: All prompts now include the orchestrator agent as a central figure with capability awareness

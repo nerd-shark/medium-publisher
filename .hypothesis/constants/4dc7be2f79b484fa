@@ -1,0 +1,4 @@
+# file: C:\Users\3717246\Repos\Medium\medium_publisher\core\publishing_workflow.py
+# hypothesis_version: 6.148.2
+
+['PublishingWorkflow', 'Typing article...', 'alt_text', 'block_index', 'caption', 'char_offset', 'correct_char', 'image', 'image_placeholder', 'surrounding_context', 'table', 'table_placeholder', 'wrong_char']

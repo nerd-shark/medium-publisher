@@ -1,0 +1,25 @@
+# Spec Configuration
+spec:
+  name: "medium-article-publisher"
+  type: "feature"
+  status: "planning"
+
+# Affected Repositories
+affected_repositories:
+  - name: "Medium"
+    path: "."
+    branch_strategy: "feature"
+    create_branch: false
+    branch_name: "feature/medium-article-publisher"
+
+# Branch Configuration
+branching:
+  base_branch: "main"
+  auto_create: false
+  naming_pattern: "feature/{spec-name}"
+
+# Integration Points
+integration:
+  ado_work_item: null
+  related_specs: []
+  dependencies: []

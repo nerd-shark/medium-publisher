@@ -1,0 +1,4 @@
+# file: C:\Users\3717246\Repos\Medium\medium_publisher\automation\os_input_controller.py
+# hypothesis_version: 6.148.2
+
+[0.8, 1000.0, 200, 'alt', 'char', 'ctrl', 'error', 'left', 'shift', 'win']

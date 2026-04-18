@@ -1,0 +1,4 @@
+# file: C:\Users\3717246\Repos\Medium\medium_publisher\core\session_manager.py
+# hypothesis_version: 6.148.2
+
+['.medium_publisher', '.tmp', 'Session cleared', 'Session file deleted', 'article_path', 'batch_articles', 'current_article', 'current_batch_index', 'current_step', 'current_version', 'deferred_typos', 'draft_url', 'last_operation', 'last_updated', 'progress', 'r', 'session_id', 'session_state.json', 'started_at', 'total_articles', 'utf-8', 'versions_completed', 'w']

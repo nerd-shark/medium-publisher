@@ -1,0 +1,4 @@
+# file: C:\Users\3717246\Repos\Medium\medium_publisher\utils\error_recovery.py
+# hypothesis_version: 6.148.2
+
+[2.0, 5.0, 10.0, 60.0, 300.0, 500, 'ErrorRecoveryManager', 'ProgressCheckpoint', 'Recovery state saved', 'exponential', 'fixed', 'https://medium.com', 'linear', 'operation', 'timestamp']

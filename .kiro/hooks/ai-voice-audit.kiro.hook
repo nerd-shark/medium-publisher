@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "Anti-AI Voice Audit",
+  "description": "After editing any social media advertising post, automatically audit the content for AI writing telltale signs (fake contrast, absurd certainty, too-perfect rhythm, desperate importance) and fix any issues found.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "**/advertising/*-post.md"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "You just edited a social media post file. Run the Anti-AI-Voice audit from the medium-article-process steering doc against the file you just saved. Check for these four AI tells:\n\n1. FAKE CONTRAST: Search for \"Not X. Y.\" patterns, false binaries, short punchy fragment pairs used as rhetorical tricks rather than genuine distinctions.\n\n2. ABSURD CERTAINTY: Flag absolute language — \"always\", \"never\", \"everyone\", \"proven\", \"everything changes\", \"fundamental shift\" — unless backed by hard data. Replace with qualified, honest language.\n\n3. TOO-PERFECT RHYTHM: Look for triplet sentence groups, perfectly parallel bullet structures, sections that all follow identical internal structure, and lists where every item has the same cadence and length. Break up symmetry.\n\n4. DESPERATE IMPORTANCE: Strip language that frames everything as a historic moment — \"this changes everything\", \"we are witnessing\", treating a benchmark like a civilizational warning.\n\nIf you find issues, fix them in place and briefly note what you changed. If the post is clean, say so in one sentence and move on."
+  }
+}

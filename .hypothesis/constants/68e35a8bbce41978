@@ -1,0 +1,4 @@
+# file: C:\Users\3717246\Repos\Medium\medium_publisher\utils\validators.py
+# hypothesis_version: 6.148.2
+
+[200, 300, 500, 600, 1024, '\x00', '.md', '.medium.com', '/', 'Tags must be a list', 'Validation passed', '^/@[\\w\\-]+/[\\w\\-]+$', '^/[\\w][\\w\\-]*$', '^/new-story$', '^/p/[\\w\\-]+$', '^/p/[\\w\\-]+/edit$', '^[a-zA-Z0-9\\s\\-]+$', '^[a-zA-Z0-9\\s\\-_]+$', '^v(\\d+)$', 'add', 'alt_text', 'append', 'change', 'content', 'delete', 'domain', 'error', 'extension', 'https', 'image_placeholder', 'insert', 'keywords', 'max', 'medium.com', 'min', 'modify', 'number', 'paragraph', 'path', 'r', 'remove', 'replace', 'scheme', 'section', 'size', 'subtitle', 'subtitle_length', 'table_placeholder', 'tag', 'tag_count', 'tag_index', 'tag_length', 'tag_type', 'tags', 'timeout', 'title', 'title_length', 'type', 'update', 'url', 'utf-8', 'version', 'www.medium.com']

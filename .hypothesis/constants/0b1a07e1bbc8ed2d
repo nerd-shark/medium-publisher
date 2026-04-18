@@ -1,0 +1,4 @@
+# file: C:\Users\3717246\Repos\Medium\medium_publisher\core\models.py
+# hypothesis_version: 6.148.2
+
+[0.0, 200, '.md', '^[a-zA-Z0-9\\s\\-]+$', 'alt_text', 'bold', 'code', 'draft', 'drafts_page', 'error', 'google_sign_in', 'header', 'image_placeholder', 'italic', 'link', 'list', 'logged_in_home', 'logged_out_home', 'new_story_editor', 'paragraph', 'public', 'ready', 'sign_in_screen', 'start', 'table_placeholder', 'waiting_2fa']

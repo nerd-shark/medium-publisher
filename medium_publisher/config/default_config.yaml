@@ -1,0 +1,63 @@
+# Medium Article Publisher - Default Configuration
+
+# Typing Settings
+typing:
+  # Base typing speed in milliseconds per keystroke (~75 WPM)
+  base_delay_ms: 150
+  # Random variation range (±30%)
+  variation_percent: 30
+  # Enable human-like typing simulation
+  human_typing_enabled: true
+  # Typo frequency: low (2%), medium (5%), high (8%), none (0%)
+  typo_frequency: "none"
+  # Ratio of typos corrected immediately vs deferred to review pass
+  immediate_correction_ratio: 0.70
+  # Thinking pause range between sentences (ms)
+  thinking_pause_min_ms: 500
+  thinking_pause_max_ms: 2000
+  # Paragraph pause range (ms)
+  paragraph_pause_min_ms: 1000
+  paragraph_pause_max_ms: 3000
+
+# Publishing Settings
+publishing:
+  # Default publish mode: draft or public
+  default_mode: "draft"
+  # Maximum number of tags (Medium limit is 5)
+  max_tags: 5
+
+# Safety Settings
+safety:
+  # Hotkey to trigger emergency stop
+  emergency_stop_hotkey: "ctrl+shift+escape"
+  # Countdown seconds before typing starts
+  countdown_seconds: 3
+  # Pause typing when focus window changes
+  focus_check_enabled: true
+
+# Navigation Settings
+navigation:
+  # Screen recognition confidence threshold (0.0-1.0)
+  screen_confidence: 0.8
+  # Polling interval for state detection (seconds)
+  poll_interval_seconds: 2
+  # Login timeout (seconds) - 5 minutes
+  login_timeout_seconds: 300
+  # Page load timeout (seconds)
+  page_load_timeout_seconds: 30
+  # Google account email for OAuth account chooser
+  google_account_email: "diverdan326@gmail.com"
+
+# UI Settings
+ui:
+  # Keep application window on top of other windows
+  always_on_top: true
+  # Remember window position across sessions
+  remember_window_position: true
+  # Remember last selected directory across sessions
+  remember_last_directory: true
+
+# Asset Settings
+assets:
+  # Directory containing reference images for screen recognition
+  reference_images_dir: "assets/medium/"

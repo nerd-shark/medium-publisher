@@ -1,0 +1,126 @@
+<mxfile host="app.diagrams.net" modified="2025-02-08T00:00:00.000Z" agent="AI Agent" version="22.1.16">
+  <diagram name="3-Minute Demo Structure" id="demo-structure">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        
+        <!-- Title -->
+        <mxCell id="title" value="The 3-Minute Executive Demo Structure" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="334.5" y="40" width="500" height="40" as="geometry"/>
+        </mxCell>
+        
+        <!-- Timeline Bar -->
+        <mxCell id="timeline-bg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="100" y="120" width="969" height="60" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="timeline-label" value="Total Time: 3 Minutes Maximum" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="434.5" y="135" width="300" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- Phase 1: Set Up Problem (30 seconds) -->
+        <mxCell id="phase1-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="100" y="240" width="280" height="180" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="phase1-title" value="1. Set Up the Problem" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="100" y="250" width="280" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="phase1-time" value="⏱ 30 seconds" style="text;html=1;strokeColor=none;fillColor=#fff2cc;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=14;fontStyle=1;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="140" y="290" width="200" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="phase1-content" value="• Remind them of the pain&#xa;• Use specific numbers&#xa;• Show business impact&#xa;&#xa;Example:&#xa;&quot;200 refunds/day × 45 min each&#xa;= 150 hours of manual work/week&quot;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="110" y="330" width="260" height="80" as="geometry"/>
+        </mxCell>
+        
+        <!-- Phase 2: Show Solution (90 seconds) -->
+        <mxCell id="phase2-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="444.5" y="240" width="280" height="180" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="phase2-title" value="2. Show the Solution" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="444.5" y="250" width="280" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="phase2-time" value="⏱ 90 seconds" style="text;html=1;strokeColor=none;fillColor=#fff2cc;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=14;fontStyle=1;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="484.5" y="290" width="200" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="phase2-content" value="• Show outcome, not process&#xa;• Pre-load everything&#xa;• One clear workflow&#xa;&#xa;Example:&#xa;&quot;Watch this. Customer ID, amount,&#xa;reason. Click. Done. 30 seconds&#xa;instead of 45 minutes.&quot;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="454.5" y="330" width="260" height="80" as="geometry"/>
+        </mxCell>
+        
+        <!-- Phase 3: State Impact (60 seconds) -->
+        <mxCell id="phase3-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="789" y="240" width="280" height="180" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="phase3-title" value="3. State the Impact" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="789" y="250" width="280" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="phase3-time" value="⏱ 60 seconds" style="text;html=1;strokeColor=none;fillColor=#fff2cc;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=14;fontStyle=1;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="829" y="290" width="200" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="phase3-content" value="• Restate time/cost savings&#xa;• Add business benefit&#xa;• Give timeline&#xa;&#xa;Example:&#xa;&quot;$200K annually in labor costs,&#xa;plus instant refunds for customers.&#xa;Production in 6 weeks.&quot;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="799" y="330" width="260" height="80" as="geometry"/>
+        </mxCell>
+        
+        <!-- Arrows -->
+        <mxCell id="arrow1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=3;fontSize=11;strokeColor=#666666;" edge="1" parent="1" source="phase1-box" target="phase2-box">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="arrow2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=3;fontSize=11;strokeColor=#666666;" edge="1" parent="1" source="phase2-box" target="phase3-box">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        
+        <!-- Key Rules Box -->
+        <mxCell id="rules-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="100" y="480" width="969" height="180" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="rules-title" value="Critical Demo Rules" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="434.5" y="490" width="300" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- Before Demo -->
+        <mxCell id="before-title" value="Before Demo:" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="120" y="530" width="280" height="20" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="before-content" value="✓ Test in actual environment&#xa;✓ Pre-load and log in&#xa;✓ Pre-populate test data&#xa;✓ Disable notifications&#xa;✓ Have backup (video/screenshots)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="120" y="555" width="280" height="95" as="geometry"/>
+        </mxCell>
+        
+        <!-- During Demo -->
+        <mxCell id="during-title" value="During Demo:" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="444.5" y="530" width="280" height="20" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="during-content" value="✓ Show outcomes, not processes&#xa;✓ Use real numbers&#xa;✓ Keep under 3 minutes&#xa;✓ Handle failures gracefully&#xa;✓ Switch to backup immediately" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="444.5" y="555" width="280" height="95" as="geometry"/>
+        </mxCell>
+        
+        <!-- After Demo -->
+        <mxCell id="after-title" value="After Demo:" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="789" y="530" width="280" height="20" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="after-content" value="✓ Restate business value&#xa;✓ Provide clear timeline&#xa;✓ Send follow-up with recording&#xa;✓ Invite questions&#xa;✓ Confirm next steps" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="789" y="555" width="280" height="95" as="geometry"/>
+        </mxCell>
+        
+        <!-- Bottom Warning -->
+        <mxCell id="warning" value="⚠️ If you can't demo your solution in 3 minutes, you're either showing too much or solving the wrong problem" style="text;html=1;strokeColor=#b85450;fillColor=#f8cecc;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=13;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="234.5" y="700" width="700" height="40" as="geometry"/>
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

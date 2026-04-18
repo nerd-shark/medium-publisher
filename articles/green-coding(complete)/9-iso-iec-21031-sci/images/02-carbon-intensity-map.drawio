@@ -1,0 +1,66 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="carbon-intensity-map" name="Carbon Intensity by Region">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="675" math="0" shadow="0" background="#FFFFFF">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="The Same Code, Different Carbon Cost" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=22;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="310" y="20" width="580" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="Carbon intensity of electricity grids (gCO&#x2082;/kWh) &amp;mdash; same computation, up to 12x different carbon cost" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=13;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="230" y="55" width="740" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="iceland-box" value="Iceland&#xa;~0 gCO&#x2082;/kWh&#xa;Geothermal / Hydro" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1B5E20;strokeColor=#1B5E20;fontColor=#FFFFFF;fontSize=12;fontStyle=1;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="120" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="sweden-box" value="Sweden&#xa;~45 gCO&#x2082;/kWh&#xa;Hydro / Nuclear" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2E7D32;strokeColor=#2E7D32;fontColor=#FFFFFF;fontSize=12;fontStyle=1;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="220" y="120" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="france-box" value="France&#xa;~56 gCO&#x2082;/kWh&#xa;Nuclear" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#388E3C;strokeColor=#388E3C;fontColor=#FFFFFF;fontSize=12;fontStyle=1;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="400" y="120" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="germany-box" value="Germany&#xa;~350 gCO&#x2082;/kWh&#xa;Coal / Renewables" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F57F17;strokeColor=#F57F17;fontColor=#FFFFFF;fontSize=12;fontStyle=1;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="230" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="us-box" value="US Average&#xa;~400 gCO&#x2082;/kWh&#xa;Mixed" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EF6C00;strokeColor=#EF6C00;fontColor=#FFFFFF;fontSize=12;fontStyle=1;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="220" y="230" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="poland-box" value="Poland&#xa;~670 gCO&#x2082;/kWh&#xa;Coal" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C62828;strokeColor=#C62828;fontColor=#FFFFFF;fontSize=12;fontStyle=1;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="400" y="230" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="india-box" value="India&#xa;~700 gCO&#x2082;/kWh&#xa;Coal" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B71C1C;strokeColor=#B71C1C;fontColor=#FFFFFF;fontSize=12;fontStyle=1;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="580" y="230" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-12x" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#333333;dashed=1;endArrow=blockThin;endFill=1;startArrow=blockThin;startFill=1;" edge="1" parent="1" source="iceland-box" target="india-box">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="120" y="350" />
+              <mxPoint x="660" y="350" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arrow-label" value="12x difference" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="340" y="340" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="example-box" value="Same API call: 0.003 gCO&#x2082; in Iceland vs 0.035 gCO&#x2082; in India" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#999999;fontColor=#333333;fontSize=13;fontStyle=0;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="200" y="390" width="400" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="scale-label-low" value="Low Carbon" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=11;fontColor=#1B5E20;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="460" width="90" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="scale-bar" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;gradientColor=#B71C1C;gradientDirection=east;fillColor=#1B5E20;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="140" y="455" width="520" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="scale-label-high" value="High Carbon" style="text;html=1;align=right;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=11;fontColor=#B71C1C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="670" y="460" width="90" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="scale-0" value="0" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="140" y="485" width="30" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="scale-700" value="700+ gCO&#x2082;/kWh" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="570" y="485" width="100" height="20" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

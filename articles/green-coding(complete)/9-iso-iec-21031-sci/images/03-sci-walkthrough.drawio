@@ -1,0 +1,70 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="sci-walkthrough" name="Your First SCI Score">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0" background="#FFFFFF">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Your First SCI Score" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=22;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="280" y="20" width="290" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="context" value="Example: Document Processing API &amp;mdash; 30,000 docs/month, 2 EC2 instances, us-east-1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="150" y="55" width="550" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="step1-num" value="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#9E9E9E;strokeColor=#9E9E9E;fontColor=#FFFFFF;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="100" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="step1" value="Define R&#xa;per document processed" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EEEEEE;strokeColor=#9E9E9E;fontColor=#333333;fontSize=13;arcSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="120" y="95" width="600" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow1-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#BDBDBD;endArrow=blockThin;endFill=1;" edge="1" parent="1" source="step1" target="step2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="step2-num" value="2" style="ellipse;whiteSpace=wrap;html=1;fillColor=#2E7D32;strokeColor=#2E7D32;fontColor=#FFFFFF;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="180" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="step2" value="Measure E (Energy)&#xa;150 kWh/month &#xf7; 30,000 docs = 0.005 kWh per document" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontColor=#333333;fontSize=13;arcSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="120" y="170" width="600" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow2-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#BDBDBD;endArrow=blockThin;endFill=1;" edge="1" parent="1" source="step2" target="step3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="step3-num" value="3" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1565C0;strokeColor=#1565C0;fontColor=#FFFFFF;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="260" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="step3" value="Get I (Carbon Intensity)&#xa;us-east-1 &#x2192; PJM grid &#x2192; ~380 gCO&#x2082;/kWh" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1565C0;fontColor=#333333;fontSize=13;arcSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="120" y="250" width="600" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow3-4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#BDBDBD;endArrow=blockThin;endFill=1;" edge="1" parent="1" source="step3" target="step4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="step4-num" value="4" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E65100;strokeColor=#E65100;fontColor=#FFFFFF;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="340" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="step4" value="Estimate M (Embodied)&#xa;0.8 kgCO&#x2082;/month &#xf7; 30,000 docs = 0.027g per document" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#E65100;fontColor=#333333;fontSize=13;arcSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="120" y="330" width="600" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow4-5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#BDBDBD;endArrow=blockThin;endFill=1;" edge="1" parent="1" source="step4" target="step5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="step5-num" value="5" style="ellipse;whiteSpace=wrap;html=1;fillColor=#333333;strokeColor=#333333;fontColor=#FFFFFF;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="430" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="step5" value="Calculate SCI&#xa;SCI = ((0.005 &#xd7; 380) + 0.027) &#xf7; 1 = 1.927 gCO&#x2082; per document" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#333333;fontColor=#333333;fontSize=14;fontStyle=1;arcSize=10;align=left;spacingLeft=10;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="120" y="420" width="600" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="pie-label" value="Where the carbon comes from:" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=13;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="200" y="510" width="220" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="bar-ei" value="E &#xd7; I = 1.9g (98.6%)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2E7D32;strokeColor=#2E7D32;fontColor=#FFFFFF;fontSize=12;fontStyle=1;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="200" y="545" width="400" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="bar-m" value="M = 0.027g (1.4%)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E65100;strokeColor=#E65100;fontColor=#FFFFFF;fontSize=11;fontStyle=1;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="605" y="545" width="115" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="insight" value="&#x2192; E &#xd7; I dominates. Focus optimization on energy efficiency or cleaner regions." style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;fontStyle=2;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="200" y="590" width="470" height="25" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

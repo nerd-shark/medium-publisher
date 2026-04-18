@@ -1,0 +1,258 @@
+# Steering Document Validation Configuration
+
+# Validation rules and settings for automated steering document validation
+validation_rules:
+  
+  # Frontmatter validation
+  frontmatter:
+    required_fields:
+      - inclusion
+      - applies_to_tools
+      - priority
+      - description
+    
+    valid_inclusion_values:
+      - always
+      - manual
+      - fileMatch
+    
+    valid_priority_values:
+      - low
+      - medium
+      - high
+      - critical
+    
+    conditional_requirements:
+      fileMatch:
+        - fileMatchPattern
+  
+  # Override documentation requirements
+  override_documentation:
+    required_fields:
+      - overrides
+      - justification
+      - created_date
+      - created_by
+    
+    optional_fields:
+      - override_id
+      - stakeholders_notified
+      - notification_sent
+      - review_date
+      - approved_by
+      - impact_assessment
+  
+  # Cross-repository coordination patterns
+  cross_repository_patterns:
+    # Patterns that typically require coordination across repositories
+    coordination_required:
+      - api
+      - authentication
+      - authorization
+      - logging
+      - monitoring
+      - error handling
+      - data models
+      - deployment
+      - security
+      - performance
+      - testing
+    
+    # Repositories that should coordinate on these patterns
+    coordination_repositories:
+      - Nagara_Backend
+      - Nagara_Frontend
+      - Nagara_PMO
+  
+  # Content quality checks
+  content_quality:
+    # Check for broken links
+    check_internal_links: true
+    
+    # Flag TODO/FIXME comments
+    flag_todo_comments: true
+    
+    # Minimum content length (characters)
+    min_content_length: 100
+    
+    # Required sections for different document types
+    required_sections:
+      standards:
+        - "Overview"
+        - "Standards"
+        - "Best Practices"
+      
+      processes:
+        - "Overview"
+        - "Process"
+        - "Responsibilities"
+      
+      architecture:
+        - "Overview"
+        - "Architecture"
+        - "Implementation"
+  
+  # ALM-SSDLC integration requirements
+  alm_ssdlc_integration:
+    # Require ALM-SSDLC references in workspace steering
+    require_workspace_references: true
+    
+    # Required integration document
+    require_integration_document: true
+    integration_document_pattern: "*alm-ssdlc-integration*"
+    
+    # Enterprise compliance patterns to check
+    compliance_patterns:
+      - security
+      - audit
+      - governance
+      - compliance
+      - enterprise
+
+# Validation severity levels
+severity_levels:
+  missing_frontmatter: warning
+  invalid_frontmatter_value: error
+  missing_override_documentation: error
+  broken_internal_link: warning
+  todo_comment: info
+  missing_alm_ssdlc_reference: warning
+  cross_repository_misalignment: warning
+  content_too_short: info
+  missing_required_section: warning
+
+# File patterns to include/exclude from validation
+file_patterns:
+  include:
+    - "**/*.md"
+  
+  exclude:
+    - "**/node_modules/**"
+    - "**/target/**"
+    - "**/build/**"
+    - "**/.git/**"
+    - "**/README.md"  # Skip generic README files
+  
+  # Special handling for specific files
+  special_files:
+    conflict_resolution_log:
+      pattern: "**/conflict-resolution-log.md"
+      skip_frontmatter_validation: true
+    
+    navigation_files:
+      pattern: "**/README.md"
+      skip_content_length_validation: true
+
+# Repository-specific validation settings
+repository_settings:
+  Nagara_Backend:
+    technology_focus: rust
+    required_categories:
+      - standards
+      - architecture
+      - integration
+    
+    technology_specific_patterns:
+      - cargo
+      - rust
+      - kube-rs
+      - tokio
+  
+  Nagara_Frontend:
+    technology_focus: typescript_react
+    required_categories:
+      - standards
+      - components
+      - integration
+    
+    technology_specific_patterns:
+      - react
+      - typescript
+      - backstage
+      - npm
+  
+  Nagara_PMO:
+    technology_focus: project_management
+    required_categories:
+      - processes
+      - documentation
+      - coordination
+    
+    technology_specific_patterns:
+      - ado
+      - helm
+      - deployment
+      - orchestration
+
+# Workspace-level validation settings
+workspace_settings:
+  required_documents:
+    - architectural-standards.md
+    - cross-repository-coordination.md
+    - alm-ssdlc-integration.md
+    - steering-precedence-framework.md
+  
+  required_categories:
+    - architecture
+    - processes
+    - standards
+    - integration
+  
+  cross_repository_focus: true
+
+# Reporting configuration
+reporting:
+  # Default output format
+  default_format: text
+  
+  # Include suggestions in reports
+  include_suggestions: true
+  
+  # Group results by category
+  group_by_category: true
+  
+  # Show file paths relative to workspace root
+  relative_paths: true
+  
+  # Maximum number of results per category to show
+  max_results_per_category: 50
+
+# Integration with external tools
+integrations:
+  # Git hooks integration
+  git_hooks:
+    pre_commit: true
+    pre_push: false
+  
+  # CI/CD integration
+  ci_cd:
+    fail_on_error: true
+    generate_artifacts: true
+    artifact_format: json
+  
+  # IDE integration
+  ide:
+    generate_diagnostics: true
+    diagnostics_format: lsp
+
+# Notification settings
+notifications:
+  # Notify on validation failures
+  on_failure:
+    enabled: true
+    channels:
+      - email
+      - slack
+  
+  # Notify on new conflicts detected
+  on_conflict:
+    enabled: true
+    channels:
+      - slack
+  
+  # Weekly summary reports
+  weekly_summary:
+    enabled: true
+    day: monday
+    channels:
+      - email

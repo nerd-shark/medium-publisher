@@ -1,0 +1,58 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="series-recap" name="Every Article Was a Lever on SCI">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="675" math="0" shadow="0" background="#FFFFFF">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Every Article Was a Lever on SCI" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=22;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="350" y="15" width="500" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="formula" value="SCI = ( E &#xd7; I + M ) per R" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=18;fontStyle=1;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="420" y="55" width="360" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="e-header" value="E &amp;mdash; Energy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2E7D32;strokeColor=#2E7D32;fontColor=#FFFFFF;fontSize=15;fontStyle=1;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="40" y="110" width="540" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e-part2" value="Part 2: Algorithm Patterns" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontColor=#333333;fontSize=12;arcSize=8;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="40" y="165" width="170" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e-part3" value="Part 3: Database Optimization" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontColor=#333333;fontSize=12;arcSize=8;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="225" y="165" width="175" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e-part5" value="Part 5: Microservices" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontColor=#333333;fontSize=12;arcSize=8;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="415" y="165" width="165" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e-part6" value="Part 6: Green DevOps" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontColor=#333333;fontSize=12;arcSize=8;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="40" y="220" width="170" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e-part7" value="Part 7: Sustainable AI/ML" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontColor=#333333;fontSize=12;arcSize=8;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="225" y="220" width="175" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e-part8" value="Part 8: Language Efficiency" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontColor=#333333;fontSize=12;arcSize=8;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="415" y="220" width="165" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="i-header" value="I &amp;mdash; Carbon Intensity" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1565C0;strokeColor=#1565C0;fontColor=#FFFFFF;fontSize=15;fontStyle=1;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="620" y="110" width="250" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="i-part4" value="Part 4: Carbon-Aware Apps" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1565C0;fontColor=#333333;fontSize=12;arcSize=8;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="620" y="165" width="250" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="m-header" value="M &amp;mdash; Embodied" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E65100;strokeColor=#E65100;fontColor=#FFFFFF;fontSize=15;fontStyle=1;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="620" y="230" width="250" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="m-part5" value="Part 5: Microservices (right-sizing)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#E65100;fontColor=#333333;fontSize=12;arcSize=8;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="620" y="285" width="250" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="part1-box" value="Part 1: Why Carbon Footprint Matters &amp;mdash; SCI gives you the number" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#9E9E9E;fontColor=#555555;fontSize=12;fontStyle=2;arcSize=8;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="40" y="300" width="540" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="part9-bar" value="Part 9: ISO/IEC 21031 &amp;mdash; Measure All of It With One Score" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#333333;strokeColor=#333333;fontColor=#FFFFFF;fontSize=15;fontStyle=1;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="40" y="370" width="830" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="note" value="Every optimization in the series is a lever on one of the SCI variables." style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;fontStyle=2;fontColor=#888888;" vertex="1" parent="1">
+          <mxGeometry x="250" y="435" width="400" height="25" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

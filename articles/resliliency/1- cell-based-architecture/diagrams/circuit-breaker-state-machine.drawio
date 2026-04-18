@@ -1,0 +1,88 @@
+<mxfile host="65bd71144e">
+    <diagram name="Circuit Breaker State Machine" id="circuit-breaker-states">
+        <mxGraphModel dx="660" dy="655" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="state-closed" value="CLOSED&#10;&#10;Normal Operation&#10;- All requests flow through&#10;- Monitor failure rate&#10;- Track failure count" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;fontStyle=1;align=center;verticalAlign=top;spacingTop=10;" parent="1" vertex="1">
+                    <mxGeometry x="150" y="300" width="250" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="state-open" value="OPEN&#10;&#10;Failure Mode&#10;- Block requests to primary&#10;- Route to Plan B&#10;- Wait for recovery timeout" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=14;fontStyle=1;align=center;verticalAlign=top;spacingTop=10;" parent="1" vertex="1">
+                    <mxGeometry x="650" y="300" width="250" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="state-halfopen" value="HALF-OPEN&#10;&#10;Testing Recovery&#10;- Allow limited requests&#10;- Test if service recovered&#10;- Decide: close or reopen" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;fontStyle=1;align=center;verticalAlign=top;spacingTop=10;" parent="1" vertex="1">
+                    <mxGeometry x="400" y="550" width="250" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="state-initial" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="260" y="150" width="30" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow-initial-closed" value="Start" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;fontSize=11;endArrow=classic;endFill=1;" parent="1" source="state-initial" target="state-closed" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow-closed-open" value="Failure threshold exceeded&#10;(e.g., 5 failures)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;fontSize=11;endArrow=classic;endFill=1;" parent="1" source="state-closed" target="state-open" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow-closed-closed-success" value="Request succeeds&#10;(failure_count = 0)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;strokeWidth=2;fontSize=11;endArrow=classic;endFill=1;" parent="1" source="state-closed" target="state-closed" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="100" y="338"/>
+                            <mxPoint x="100" y="413"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow-closed-closed-fail" value="Request fails&#10;(failure_count++)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=0;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;fontSize=11;endArrow=classic;endFill=1;" parent="1" source="state-closed" target="state-closed" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="213" y="250"/>
+                            <mxPoint x="338" y="250"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow-open-halfopen" value="Recovery timeout elapsed&#10;(e.g., 60 seconds)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;fontSize=11;endArrow=classic;endFill=1;" parent="1" source="state-open" target="state-halfopen" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="775" y="625"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow-open-open" value="Requests blocked&#10;(route to Plan B)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;strokeWidth=2;fontSize=11;endArrow=classic;endFill=1;" parent="1" source="state-open" target="state-open" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="950" y="338"/>
+                            <mxPoint x="950" y="413"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow-halfopen-closed" value="Test request succeeds&#10;(service recovered)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;strokeWidth=2;fontSize=11;endArrow=classic;endFill=1;" parent="1" source="state-halfopen" target="state-closed" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="275" y="625"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow-halfopen-open" value="Test request fails&#10;(service still down)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;strokeWidth=2;fontSize=11;endArrow=classic;endFill=1;" parent="1" source="state-halfopen" target="state-open" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="775" y="625"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="legend-title" value="State Transitions:" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="50" width="200" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-1" value="• Closed → Open: Too many failures" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="80" width="250" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-2" value="• Open → Half-Open: Recovery timeout" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="100" width="250" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-3" value="• Half-Open → Closed: Test successful" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="120" width="250" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-4" value="• Half-Open → Open: Test failed" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="140" width="250" height="20" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

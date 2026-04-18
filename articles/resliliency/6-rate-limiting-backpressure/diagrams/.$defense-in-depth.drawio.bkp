@@ -1,0 +1,126 @@
+<mxfile host="app.diagrams.net" modified="2026-03-29T00:00:00.000Z" agent="draw.io" version="24.0.0" type="device">
+  <diagram id="defense-in-depth" name="Defense in Depth: Rate Limiting at Every Layer">
+    <mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <!-- Title -->
+        <mxCell id="title" value="Defense in Depth: Rate Limiting at Every Layer" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=22;fontStyle=1;fontColor=#1a1a2e;" vertex="1" parent="1">
+          <mxGeometry x="400" y="15" width="800" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Incoming Traffic (left side) -->
+        <mxCell id="traffic_cloud" value="&lt;b&gt;Incoming Traffic&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;Legitimate users&lt;br&gt;Bots &amp;amp; scrapers&lt;br&gt;DDoS attacks&lt;br&gt;API abuse&lt;/font&gt;" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="20" y="330" width="180" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow from traffic to Layer 1 -->
+        <mxCell id="arr_in" value="&lt;font style=&quot;font-size:10px&quot;&gt;100% of traffic&lt;/font&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=4;strokeColor=#cc0000;endArrow=classic;endFill=1;" edge="1" parent="1" source="traffic_cloud" target="layer1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== LAYER 1: Edge / CDN / WAF ==================== -->
+        <mxCell id="layer1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#e57373;strokeWidth=3;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="250" y="80" width="200" height="720" as="geometry" />
+        </mxCell>
+        <mxCell id="l1_title" value="&lt;b&gt;LAYER 1&lt;/b&gt;&lt;br&gt;Edge / CDN / WAF" style="text;html=1;align=center;verticalAlign=top;strokeColor=none;fillColor=none;fontSize=14;fontColor=#c62828;" vertex="1" parent="1">
+          <mxGeometry x="260" y="90" width="180" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="l1_detail" value="&lt;font style=&quot;font-size:11px&quot;&gt;• Per-IP rate limiting&lt;br&gt;• DDoS mitigation&lt;br&gt;• Bot detection &amp;amp; filtering&lt;br&gt;• Geo-blocking&lt;br&gt;• TLS termination&lt;br&gt;&lt;br&gt;&lt;b&gt;Tools:&lt;/b&gt;&lt;br&gt;Cloudflare, AWS Shield,&lt;br&gt;AWS WAF, Akamai&lt;/font&gt;" style="text;html=1;align=left;verticalAlign=top;strokeColor=none;fillColor=none;fontSize=12;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="265" y="145" width="175" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="l1_blocks" value="&lt;b&gt;🚫 Blocks:&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;DDoS floods&lt;br&gt;Known bad IPs&lt;br&gt;Bot traffic&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#e57373;strokeWidth=1;fontSize=11;fontColor=#b71c1c;" vertex="1" parent="1">
+          <mxGeometry x="265" y="620" width="170" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow from Layer 1 to Layer 2 -->
+        <mxCell id="arr_12" value="&lt;font style=&quot;font-size:10px&quot;&gt;~60% passes&lt;/font&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=3;strokeColor=#e67e22;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="450" y="390" as="sourcePoint" />
+            <mxPoint x="520" y="390" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ==================== LAYER 2: API Gateway ==================== -->
+        <mxCell id="layer2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#e67e22;strokeWidth=3;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="520" y="80" width="200" height="720" as="geometry" />
+        </mxCell>
+        <mxCell id="l2_title" value="&lt;b&gt;LAYER 2&lt;/b&gt;&lt;br&gt;API Gateway" style="text;html=1;align=center;verticalAlign=top;strokeColor=none;fillColor=none;fontSize=14;fontColor=#e65100;" vertex="1" parent="1">
+          <mxGeometry x="530" y="90" width="180" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="l2_detail" value="&lt;font style=&quot;font-size:11px&quot;&gt;• Per-client rate limiting&lt;br&gt;&amp;nbsp;&amp;nbsp;(API key / OAuth token)&lt;br&gt;• Business-level limits&lt;br&gt;&amp;nbsp;&amp;nbsp;Free: 100 req/min&lt;br&gt;&amp;nbsp;&amp;nbsp;Paid: 10,000 req/min&lt;br&gt;• Authentication &amp;amp; authz&lt;br&gt;• Request validation&lt;br&gt;&lt;br&gt;&lt;b&gt;Tools:&lt;/b&gt;&lt;br&gt;Kong, AWS API GW,&lt;br&gt;Apigee, Envoy&lt;/font&gt;" style="text;html=1;align=left;verticalAlign=top;strokeColor=none;fillColor=none;fontSize=12;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="535" y="145" width="175" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="l2_blocks" value="&lt;b&gt;🚫 Blocks:&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;Unauthenticated requests&lt;br&gt;Over-limit clients&lt;br&gt;Invalid requests&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe0b2;strokeColor=#e67e22;strokeWidth=1;fontSize=11;fontColor=#e65100;" vertex="1" parent="1">
+          <mxGeometry x="535" y="620" width="170" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow from Layer 2 to Layer 3 -->
+        <mxCell id="arr_23" value="&lt;font style=&quot;font-size:10px&quot;&gt;~80% passes&lt;/font&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=3;strokeColor=#1565c0;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="720" y="390" as="sourcePoint" />
+            <mxPoint x="790" y="390" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ==================== LAYER 3: Service Mesh ==================== -->
+        <mxCell id="layer3" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1565c0;strokeWidth=3;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="790" y="80" width="200" height="720" as="geometry" />
+        </mxCell>
+        <mxCell id="l3_title" value="&lt;b&gt;LAYER 3&lt;/b&gt;&lt;br&gt;Service Mesh" style="text;html=1;align=center;verticalAlign=top;strokeColor=none;fillColor=none;fontSize=14;fontColor=#1565c0;" vertex="1" parent="1">
+          <mxGeometry x="800" y="90" width="180" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="l3_detail" value="&lt;font style=&quot;font-size:11px&quot;&gt;• Per-service rate limiting&lt;br&gt;&amp;nbsp;&amp;nbsp;(A → B: 1,000 req/s)&lt;br&gt;• Circuit breakers&lt;br&gt;• Retry budgets&lt;br&gt;• Load balancing&lt;br&gt;• Timeout enforcement&lt;br&gt;&lt;br&gt;&lt;b&gt;Tools:&lt;/b&gt;&lt;br&gt;Istio, Linkerd, Envoy,&lt;br&gt;AWS App Mesh&lt;/font&gt;" style="text;html=1;align=left;verticalAlign=top;strokeColor=none;fillColor=none;fontSize=12;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="805" y="145" width="175" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="l3_blocks" value="&lt;b&gt;🚫 Blocks:&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;Internal cascade failures&lt;br&gt;Service-to-service overload&lt;br&gt;Retry storms&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1565c0;strokeWidth=1;fontSize=11;fontColor=#0d47a1;" vertex="1" parent="1">
+          <mxGeometry x="805" y="620" width="170" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow from Layer 3 to Layer 4 -->
+        <mxCell id="arr_34" value="&lt;font style=&quot;font-size:10px&quot;&gt;~95% passes&lt;/font&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=3;strokeColor=#2e7d32;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="990" y="390" as="sourcePoint" />
+            <mxPoint x="1060" y="390" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ==================== LAYER 4: Application ==================== -->
+        <mxCell id="layer4" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#2e7d32;strokeWidth=3;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="80" width="200" height="720" as="geometry" />
+        </mxCell>
+        <mxCell id="l4_title" value="&lt;b&gt;LAYER 4&lt;/b&gt;&lt;br&gt;Application" style="text;html=1;align=center;verticalAlign=top;strokeColor=none;fillColor=none;fontSize=14;fontColor=#2e7d32;" vertex="1" parent="1">
+          <mxGeometry x="1070" y="90" width="180" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="l4_detail" value="&lt;font style=&quot;font-size:11px&quot;&gt;• Bounded queues&lt;br&gt;• Connection pool limits&lt;br&gt;• Thread pool limits&lt;br&gt;• Priority queuing&lt;br&gt;• Load shedding&lt;br&gt;• Graceful degradation&lt;br&gt;&lt;br&gt;&lt;b&gt;Last line of defense&lt;/b&gt;&lt;br&gt;Prevents resource&lt;br&gt;exhaustion&lt;/font&gt;" style="text;html=1;align=left;verticalAlign=top;strokeColor=none;fillColor=none;fontSize=12;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="1075" y="145" width="175" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="l4_blocks" value="&lt;b&gt;🚫 Blocks:&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;Resource exhaustion&lt;br&gt;Unbounded queues&lt;br&gt;Low-priority work (shed)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;strokeWidth=1;fontSize=11;fontColor=#1b5e20;" vertex="1" parent="1">
+          <mxGeometry x="1075" y="620" width="170" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow from Layer 4 to Protected Core -->
+        <mxCell id="arr_4core" value="&lt;font style=&quot;font-size:10px&quot;&gt;clean traffic&lt;/font&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=3;strokeColor=#2e7d32;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1260" y="390" as="sourcePoint" />
+            <mxPoint x="1340" y="390" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ==================== PROTECTED CORE ==================== -->
+        <mxCell id="core" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f8e9;strokeColor=#558b2f;strokeWidth=4;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1340" y="280" width="200" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="core_label" value="&lt;b&gt;🛡️ PROTECTED&lt;br&gt;APPLICATION&lt;br&gt;CORE&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot;&gt;Healthy &amp;amp; responsive&lt;br&gt;Serving users at&lt;br&gt;normal latency&lt;br&gt;&lt;br&gt;&lt;b&gt;200ms response time&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;strokeColor=none;fillColor=none;fontSize=14;fontColor=#33691e;" vertex="1" parent="1">
+          <mxGeometry x="1350" y="290" width="180" height="200" as="geometry" />
+        </mxCell>
+
+        <!-- Bottom summary bar -->
+        <mxCell id="summary_bar" value="&lt;b&gt;Each layer protects against different failure modes. No single layer is sufficient.&lt;/b&gt; If Layer 1 misses something, Layer 2 catches it. If Layer 2 misses, Layer 3. Defense in depth means multiple independent safety nets." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#999999;strokeWidth=1;fontSize=12;fontColor=#333333;align=center;" vertex="1" parent="1">
+          <mxGeometry x="250" y="830" width="1010" height="50" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

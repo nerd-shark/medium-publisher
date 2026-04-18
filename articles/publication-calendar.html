@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Medium Article Publication Calendar</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0f1117;
+    color: #e0e0e0;
+    padding: 32px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 28px;
+  }
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #ccc;
+  }
+  .legend-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .month {
+    background: #1a1d27;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #2a2d3a;
+  }
+  .month-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    color: #fff;
+    text-align: center;
+  }
+  .day-headers {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    margin-bottom: 6px;
+  }
+  .day-header {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #666;
+    padding: 4px 0;
+  }
+  .days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
+  .day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    border-radius: 6px;
+    color: #555;
+    position: relative;
+    cursor: default;
+  }
+  .day.has-date {
+    color: #999;
+  }
+  .day.today {
+    outline: 2px solid #fff;
+    outline-offset: -2px;
+    color: #fff;
+    font-weight: 700;
+  }
+  .day.published {
+    color: #fff;
+    font-weight: 600;
+  }
+  .day.planned {
+    color: #fff;
+    font-weight: 600;
+    opacity: 0.8;
+  }
+  .day.planned::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+  }
+  .day.drafted {
+    color: #fff;
+    font-weight: 600;
+    opacity: 0.9;
+  }
+  .day.drafted::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.7);
+  }
+
+  /* Series colors */
+  .green-coding    { background: #1b5e20; }
+  .resilience      { background: #b71c1c; }
+  .communication   { background: #1565c0; }
+  .agentic-ai      { background: #6a1b9a; }
+  .quantum         { background: #00838f; }
+  .ai-policy       { background: #e65100; }
+  .gen-ai-coding   { background: #2e7d32; }
+  .platform-eng    { background: #4527a0; }
+  .arch-tradecraft { background: #bf360c; }
+
+  .legend-green    { background: #1b5e20; }
+  .legend-resil    { background: #b71c1c; }
+  .legend-comm     { background: #1565c0; }
+  .legend-agent    { background: #6a1b9a; }
+  .legend-quantum  { background: #00838f; }
+  .legend-policy   { background: #e65100; }
+  .legend-genai    { background: #2e7d32; }
+  .legend-plateng  { background: #4527a0; }
+  .legend-archtr   { background: #bf360c; }
+
+  .tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2a2d3a;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 100;
+    color: #e0e0e0;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    pointer-events: none;
+  }
+  .tooltip .tt-series {
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+  .tooltip .tt-title {
+    color: #aaa;
+  }
+  .tooltip .tt-status {
+    margin-top: 4px;
+    font-size: 11px;
+  }
+  .tooltip .tt-status.pub { color: #4caf50; }
+  .tooltip .tt-status.draft { color: #64b5f6; }
+  .tooltip .tt-status.plan { color: #ff9800; }
+  .day:hover .tooltip {
+    display: block;
+  }
+
+  .series-timeline {
+    max-width: 1200px;
+    margin: 40px auto 0;
+    background: #1a1d27;
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid #2a2d3a;
+  }
+  .timeline-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  .timeline-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 12px;
+  }
+  .timeline-label {
+    width: 160px;
+    font-size: 13px;
+    color: #ccc;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .timeline-bar-container {
+    flex: 1;
+    height: 28px;
+    background: #12141c;
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
+  }
+  .timeline-bar {
+    position: absolute;
+    height: 100%;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+  }
+  .timeline-months {
+    display: flex;
+    margin-left: 172px;
+    margin-top: 4px;
+  }
+  .timeline-month-label {
+    flex: 1;
+    font-size: 11px;
+    color: #666;
+    text-align: center;
+  }
+
+  .stats {
+    max-width: 1200px;
+    margin: 24px auto 0;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+  }
+  .stat-card {
+    background: #1a1d27;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #2a2d3a;
+    text-align: center;
+  }
+  .stat-number {
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .stat-label {
+    font-size: 12px;
+    color: #888;
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Medium Article Publication Calendar</h1>
+<p class="subtitle">February 2026 — September 2026 · 3 articles/week · Monday / Wednesday / Friday</p>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot legend-green"></div>Green Coding</div>
+  <div class="legend-item"><div class="legend-dot legend-resil"></div>Resilience Engineering</div>
+  <div class="legend-item"><div class="legend-dot legend-comm"></div>Communication</div>
+  <div class="legend-item"><div class="legend-dot legend-agent"></div>Agentic AI</div>
+  <div class="legend-item"><div class="legend-dot legend-quantum"></div>Quantum Computing</div>
+  <div class="legend-item"><div class="legend-dot legend-policy"></div>AI Policy</div>
+  <div class="legend-item"><div class="legend-dot legend-genai"></div>Gen-AI Coding</div>
+  <div class="legend-item"><div class="legend-dot legend-plateng"></div>Platform Engineering</div>
+  <div class="legend-item"><div class="legend-dot legend-archtr"></div>Architecture Tradecraft</div>
+</div>
+<div class="legend" style="gap:32px;margin-bottom:32px;">
+  <div class="legend-item"><span style="color:#4caf50;font-size:15px;">■</span> Published</div>
+  <div class="legend-item"><span style="color:#64b5f6;font-size:15px;">■</span> Drafted <span style="font-size:11px;color:#666;">(dash indicator)</span></div>
+  <div class="legend-item"><span style="color:#ff9800;font-size:15px;">■</span> Planned <span style="font-size:11px;color:#666;">(dot indicator)</span></div>
+</div>
+
+<div class="calendar-grid" id="calendarGrid"></div>
+
+<div class="stats">
+  <div class="stat-card">
+    <div class="stat-number">98</div>
+    <div class="stat-label">Total Articles</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">9</div>
+    <div class="stat-label" style="color:#1b5e20">Green Coding</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">12</div>
+    <div class="stat-label" style="color:#b71c1c">Resilience</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">9</div>
+    <div class="stat-label" style="color:#1565c0">Communication</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">8</div>
+    <div class="stat-label" style="color:#6a1b9a">Agentic AI</div>
+  </div>
+</div>
+<div class="stats" style="grid-template-columns: repeat(5, 1fr);">
+  <div class="stat-card">
+    <div class="stat-number">12</div>
+    <div class="stat-label" style="color:#00838f">Quantum</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">12</div>
+    <div class="stat-label" style="color:#2e7d32">Gen-AI Coding</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">12</div>
+    <div class="stat-label" style="color:#e65100">AI Policy</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">12</div>
+    <div class="stat-label" style="color:#4527a0">Platform Eng</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">12</div>
+    <div class="stat-label" style="color:#bf360c">Arch Tradecraft</div>
+  </div>
+</div>
+
+<div class="series-timeline">
+  <div class="timeline-title">Series Timeline</div>
+  <!-- Timeline spans Jan - Sep. 9 months. Each month ~11% width -->
+  <div class="timeline-row">
+    <div class="timeline-label">Green Coding</div>
+    <div class="timeline-bar-container">
+      <div class="timeline-bar" style="left:0%;width:30%;background:#1b5e20;">Jan — Mar 23</div>
+    </div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-label">Resilience</div>
+    <div class="timeline-bar-container">
+      <div class="timeline-bar" style="left:0%;width:56%;background:#b71c1c;">Jan — Jun 01</div>
+    </div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-label">Communication</div>
+    <div class="timeline-bar-container">
+      <div class="timeline-bar" style="left:11%;width:31%;background:#1565c0;">Feb — Apr 24</div>
+    </div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-label">Agentic AI</div>
+    <div class="timeline-bar-container">
+      <div class="timeline-bar" style="left:11%;width:33%;background:#6a1b9a;">Feb — Apr 29</div>
+    </div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-label">Quantum Computing</div>
+    <div class="timeline-bar-container">
+      <div class="timeline-bar" style="left:36%;width:38%;background:#00838f;">Apr 13 — Jul 24</div>
+    </div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-label">Gen-AI Coding</div>
+    <div class="timeline-bar-container">
+      <div class="timeline-bar" style="left:44%;width:40%;background:#2e7d32;">May 06 — Aug 21</div>
+    </div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-label">AI Policy</div>
+    <div class="timeline-bar-container">
+      <div class="timeline-bar" style="left:44%;width:39%;background:#e65100;">May 04 — Aug 19</div>
+    </div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-label">Platform Engineering</div>
+    <div class="timeline-bar-container">
+      <div class="timeline-bar" style="left:56%;width:35%;background:#4527a0;">Jun 10 — Sep 09</div>
+    </div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-label">Arch Tradecraft</div>
+    <div class="timeline-bar-container">
+      <div class="timeline-bar" style="left:74%;width:22%;background:#bf360c;">Jul 29 — Sep 23</div>
+    </div>
+  </div>
+  <div class="timeline-months">
+    <div class="timeline-month-label">Jan</div>
+    <div class="timeline-month-label">Feb</div>
+    <div class="timeline-month-label">Mar</div>
+    <div class="timeline-month-label">Apr</div>
+    <div class="timeline-month-label">May</div>
+    <div class="timeline-month-label">Jun</div>
+    <div class="timeline-month-label">Jul</div>
+    <div class="timeline-month-label">Aug</div>
+    <div class="timeline-month-label">Sep</div>
+  </div>
+</div>
+
+<script>
+const articles = [
+  // Green Coding (published — concludes Mar 23)
+  { date: '2026-02-02', series: 'green-coding', title: 'Part 4: Building Carbon-Aware Applications', status: 'published' },
+  { date: '2026-02-17', series: 'green-coding', title: 'Part 5: Sustainable Microservices Architecture', status: 'published' },
+  { date: '2026-02-23', series: 'green-coding', title: 'Part 6: Green DevOps Practices', status: 'published' },
+  { date: '2026-03-04', series: 'green-coding', title: 'Part 7: Sustainable AI/ML and MLOps', status: 'published' },
+  { date: '2026-03-13', series: 'green-coding', title: 'Part 8: Programming Language Efficiency Deep Dive', status: 'published' },
+  { date: '2026-03-23', series: 'green-coding', title: 'Part 9: Carbon-Aware Workload Placement ✅ FINALE', status: 'published' },
+
+  // Resilience (published through Part 7, planned Part 8-12)
+  { date: '2026-02-04', series: 'resilience', title: 'Part 2: Chaos Engineering in Production', status: 'published' },
+  { date: '2026-02-19', series: 'resilience', title: 'Part 3: The $10M Blind Spot', status: 'published' },
+  { date: '2026-02-25', series: 'resilience', title: 'Part 4: When Everything Fails', status: 'published' },
+  { date: '2026-03-06', series: 'resilience', title: 'Part 5: The Day AWS Went Down', status: 'published' },
+  { date: '2026-03-16', series: 'resilience', title: 'Part 6: Rate Limiting and Backpressure', status: 'published' },
+  { date: '2026-03-25', series: 'resilience', title: 'Part 7: The Bulkhead Pattern', status: 'published' },
+  { date: '2026-04-15', series: 'resilience', title: 'Part 8: Incident Response', status: 'planned' },
+  { date: '2026-04-27', series: 'resilience', title: 'Part 9: Database Resilience', status: 'planned' },
+  { date: '2026-05-11', series: 'resilience', title: 'Part 10: The Cost of Resilience', status: 'planned' },
+  { date: '2026-05-20', series: 'resilience', title: 'Part 11: Kubernetes Resilience', status: 'planned' },
+  { date: '2026-06-01', series: 'resilience', title: 'Part 12: Capstone Case Study ✅ FINALE', status: 'planned' },
+
+  // Communication (published through Part 7, planned Part 8-9)
+  { date: '2026-02-06', series: 'communication', title: 'Part 2: Navigating Executive Disagreement', status: 'published' },
+  { date: '2026-02-21', series: 'communication', title: 'Part 3: The Technical Presentation Playbook', status: 'published' },
+  { date: '2026-02-27', series: 'communication', title: 'Part 4: Architecture Review Survival Guide', status: 'published' },
+  { date: '2026-03-09', series: 'communication', title: 'Part 5: The Design Review Playbook', status: 'published' },
+  { date: '2026-03-18', series: 'communication', title: 'Part 6: Writing Technical Documents', status: 'published' },
+  { date: '2026-03-27', series: 'communication', title: 'Part 7: Communicating Technical Debt', status: 'published' },
+  { date: '2026-04-17', series: 'communication', title: 'Part 8: Cross-Functional Communication', status: 'planned' },
+  { date: '2026-04-24', series: 'communication', title: 'Part 9: HealthCare.gov Rescue — Capstone ✅ FINALE', status: 'planned' },
+
+  // Agentic AI (published through Part 6, planned Part 7-8)
+  { date: '2026-03-02', series: 'agentic-ai', title: 'Part 3: Multi-Agent Systems', status: 'published' },
+  { date: '2026-03-11', series: 'agentic-ai', title: 'Part 4: Building Your First Agentic AI System', status: 'published' },
+  { date: '2026-03-20', series: 'agentic-ai', title: 'Part 5: The Promise/Work Pattern', status: 'published' },
+  { date: '2026-03-30', series: 'agentic-ai', title: 'Part 6: Memory Systems for AI Agents', status: 'published' },
+  { date: '2026-04-20', series: 'agentic-ai', title: 'Part 7: Agentic AI ROI', status: 'planned' },
+  { date: '2026-04-29', series: 'agentic-ai', title: 'Part 8: Capstone Case Study ✅ FINALE', status: 'planned' },
+
+  // Quantum Computing (published Part 0, planned Part 1-11)
+  { date: '2026-04-13', series: 'quantum', title: 'Part 0: Why Architects Need to Think About Quantum Now', status: 'published' },
+  { date: '2026-04-22', series: 'quantum', title: 'Part 1: The QPU as a Coprocessor', status: 'planned' },
+  { date: '2026-05-01', series: 'quantum', title: 'Part 2: Quantum-Classical Hybrid Patterns', status: 'planned' },
+  { date: '2026-05-08', series: 'quantum', title: 'Part 3: Designing for Probabilistic Outputs', status: 'planned' },
+  { date: '2026-05-18', series: 'quantum', title: 'Part 4: Run Your First Quantum Circuit', status: 'planned' },
+  { date: '2026-05-29', series: 'quantum', title: 'Part 5: The Cryptographic Bill of Materials', status: 'planned' },
+  { date: '2026-06-08', series: 'quantum', title: 'Part 6: Post-Quantum Cryptography in Practice', status: 'planned' },
+  { date: '2026-06-17', series: 'quantum', title: 'Part 7: The Quantum Control Plane', status: 'planned' },
+  { date: '2026-06-26', series: 'quantum', title: 'Part 8: The Quantum Price Tag', status: 'planned' },
+  { date: '2026-07-06', series: 'quantum', title: 'Part 9: Quantum Machine Learning Pipelines', status: 'planned' },
+  { date: '2026-07-15', series: 'quantum', title: 'Part 10: The Fault-Tolerant Future', status: 'planned' },
+  { date: '2026-07-24', series: 'quantum', title: 'Part 11: Capstone Case Study ✅ FINALE', status: 'planned' },
+
+  // Gen-AI Coding (all planned, starts May 06)
+  { date: '2026-05-06', series: 'gen-ai-coding', title: 'Part 1: From Editors to Co-Developers', status: 'planned' },
+  { date: '2026-05-15', series: 'gen-ai-coding', title: 'Part 2: What Gen-AI Does Well in Code', status: 'planned' },
+  { date: '2026-05-27', series: 'gen-ai-coding', title: 'Part 3: AI as a Pair Programmer', status: 'planned' },
+  { date: '2026-06-05', series: 'gen-ai-coding', title: 'Part 4: Prompt Engineering for Engineers', status: 'planned' },
+  { date: '2026-06-15', series: 'gen-ai-coding', title: 'Part 5: The IDE Landscape', status: 'planned' },
+  { date: '2026-06-24', series: 'gen-ai-coding', title: 'Part 6: Gen-AI and the Documentation Gap', status: 'planned' },
+  { date: '2026-07-03', series: 'gen-ai-coding', title: 'Part 7: AI-Assisted Testing', status: 'planned' },
+  { date: '2026-07-13', series: 'gen-ai-coding', title: 'Part 8: Code Review in the Age of AI', status: 'planned' },
+  { date: '2026-07-22', series: 'gen-ai-coding', title: 'Part 9: Enterprise-Aware AI', status: 'planned' },
+  { date: '2026-08-03', series: 'gen-ai-coding', title: 'Part 10: Gen-AI Across the SSDLC', status: 'planned' },
+  { date: '2026-08-12', series: 'gen-ai-coding', title: 'Part 11: Risks and Anti-Patterns', status: 'planned' },
+  { date: '2026-08-21', series: 'gen-ai-coding', title: 'Part 12: Capstone ✅ FINALE', status: 'planned' },
+
+  // AI Policy (all planned, starts May 04)
+  { date: '2026-05-04', series: 'ai-policy', title: 'Part 1: The U.S. AI Governance Model', status: 'planned' },
+  { date: '2026-05-13', series: 'ai-policy', title: 'Part 2: AI-Driven Productivity Gains', status: 'planned' },
+  { date: '2026-05-22', series: 'ai-policy', title: 'Part 3: Reskilling Is Necessary but Not Sufficient', status: 'planned' },
+  { date: '2026-06-03', series: 'ai-policy', title: 'Part 4: AI and Deterrence Stability', status: 'planned' },
+  { date: '2026-06-12', series: 'ai-policy', title: 'Part 5: Human Capital Policy', status: 'planned' },
+  { date: '2026-06-22', series: 'ai-policy', title: 'Part 6: Federal AI Transition Compact', status: 'planned' },
+  { date: '2026-07-01', series: 'ai-policy', title: 'Part 7: Frontier Model Oversight', status: 'planned' },
+  { date: '2026-07-10', series: 'ai-policy', title: 'Part 8: Physical AI', status: 'planned' },
+  { date: '2026-07-20', series: 'ai-policy', title: 'Part 9: White-Collar Displacement', status: 'planned' },
+  { date: '2026-07-31', series: 'ai-policy', title: 'Part 10: Redefining the Social Contract', status: 'planned' },
+  { date: '2026-08-10', series: 'ai-policy', title: 'Part 11: How to AI-Proof Your Career', status: 'planned' },
+  { date: '2026-08-19', series: 'ai-policy', title: 'Part 12: Capstone ✅ FINALE', status: 'planned' },
+
+  // Platform Engineering (all planned, starts Jun 10)
+  { date: '2026-06-10', series: 'platform-eng', title: 'Part 1: DevOps Won. Now What?', status: 'planned' },
+  { date: '2026-06-19', series: 'platform-eng', title: 'Part 2: Platform-as-Product Mindset', status: 'planned' },
+  { date: '2026-06-29', series: 'platform-eng', title: 'Part 3: Golden Paths and Guardrails', status: 'planned' },
+  { date: '2026-07-08', series: 'platform-eng', title: 'Part 4: Designing the IDP', status: 'planned' },
+  { date: '2026-07-17', series: 'platform-eng', title: 'Part 5: Self-Service Infrastructure', status: 'planned' },
+  { date: '2026-07-27', series: 'platform-eng', title: 'Part 6: Platform Team Topology', status: 'planned' },
+  { date: '2026-08-05', series: 'platform-eng', title: 'Part 7: Developer Experience Metrics', status: 'planned' },
+  { date: '2026-08-14', series: 'platform-eng', title: 'Part 8: Security in the Platform Layer', status: 'planned' },
+  { date: '2026-08-24', series: 'platform-eng', title: 'Part 9: Platform Observability', status: 'planned' },
+  { date: '2026-08-28', series: 'platform-eng', title: 'Part 10: Platform Economics', status: 'planned' },
+  { date: '2026-09-02', series: 'platform-eng', title: 'Part 11: Platform Anti-Patterns', status: 'planned' },
+  { date: '2026-09-09', series: 'platform-eng', title: 'Part 12: Capstone — Mercado Libre ✅ FINALE', status: 'planned' },
+
+  // Architecture Tradecraft (all planned, starts Jul 29)
+  { date: '2026-07-29', series: 'arch-tradecraft', title: 'Part 1: Decisions Nobody Writes Down', status: 'planned' },
+  { date: '2026-08-07', series: 'arch-tradecraft', title: 'Part 2: When NOT to Use Microservices', status: 'planned' },
+  { date: '2026-08-17', series: 'arch-tradecraft', title: 'Part 3: Event-Driven vs. Workflow-Driven', status: 'planned' },
+  { date: '2026-08-26', series: 'arch-tradecraft', title: 'Part 4: Conway\'s Law in Practice', status: 'planned' },
+  { date: '2026-08-31', series: 'arch-tradecraft', title: 'Part 5: Build vs. Buy vs. Compose', status: 'planned' },
+  { date: '2026-09-04', series: 'arch-tradecraft', title: 'Part 6: Evolutionary Architecture', status: 'planned' },
+  { date: '2026-09-11', series: 'arch-tradecraft', title: 'Part 7: Data Architecture Decisions', status: 'planned' },
+  { date: '2026-09-14', series: 'arch-tradecraft', title: 'Part 8: API Design as Architecture', status: 'planned' },
+  { date: '2026-09-16', series: 'arch-tradecraft', title: 'Part 9: Cloud-Native Fitness', status: 'planned' },
+  { date: '2026-09-18', series: 'arch-tradecraft', title: 'Part 10: Regulatory Constraint', status: 'planned' },
+  { date: '2026-09-21', series: 'arch-tradecraft', title: 'Part 11: Architecture Review That Works', status: 'planned' },
+  { date: '2026-09-23', series: 'arch-tradecraft', title: 'Part 12: Capstone — Spotify Model ✅ FINALE', status: 'planned' },
+];
+
+// Build lookup
+const articleMap = {};
+articles.forEach(a => { articleMap[a.date] = a; });
+
+const seriesLabels = {
+  'green-coding': 'Green Coding',
+  'resilience': 'Resilience Engineering',
+  'communication': 'Communication',
+  'agentic-ai': 'Agentic AI',
+  'quantum': 'Quantum Computing',
+  'gen-ai-coding': 'Gen-AI Coding',
+  'ai-policy': 'AI Policy',
+  'platform-eng': 'Platform Engineering',
+  'arch-tradecraft': 'Architecture Tradecraft'
+};
+
+const months = [
+  { year: 2026, month: 1, name: 'February 2026' },
+  { year: 2026, month: 2, name: 'March 2026' },
+  { year: 2026, month: 3, name: 'April 2026' },
+  { year: 2026, month: 4, name: 'May 2026' },
+  { year: 2026, month: 5, name: 'June 2026' },
+  { year: 2026, month: 6, name: 'July 2026' },
+  { year: 2026, month: 7, name: 'August 2026' },
+  { year: 2026, month: 8, name: 'September 2026' },
+];
+
+const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const grid = document.getElementById('calendarGrid');
+
+const today = new Date(2026, 3, 13); // Apr 13, 2026
+
+months.forEach(({year, month, name}) => {
+  const div = document.createElement('div');
+  div.className = 'month';
+
+  let html = `<div class="month-title">${name}</div>`;
+  html += '<div class="day-headers">';
+  dayNames.forEach(d => { html += `<div class="day-header">${d}</div>`; });
+  html += '</div><div class="days">';
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  for (let i = 0; i < firstDay; i++) {
+    html += '<div class="day"></div>';
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const article = articleMap[dateStr];
+    const isToday = (year === today.getFullYear() && month === today.getMonth() && d === today.getDate());
+
+    let classes = 'day has-date';
+    if (isToday) classes += ' today';
+
+    if (article) {
+      const statusClass = article.status === 'published' ? 'published' : article.status === 'drafted' ? 'drafted' : 'planned';
+      classes += ` ${article.series} ${statusClass}`;
+      const ttClass = article.status === 'published' ? 'pub' : article.status === 'drafted' ? 'draft' : 'plan';
+      const ttLabel = article.status === 'published' ? '✅ Published' : article.status === 'drafted' ? '📝 Drafted' : '📅 Planned';
+      html += `<div class="${classes}">${d}<div class="tooltip"><div class="tt-series">${seriesLabels[article.series]}</div><div class="tt-title">${article.title}</div><div class="tt-status ${ttClass}">${ttLabel}</div></div></div>`;
+    } else {
+      html += `<div class="${classes}">${d}</div>`;
+    }
+  }
+
+  html += '</div>';
+  div.innerHTML = html;
+  grid.appendChild(div);
+});
+</script>
+
+</body>
+</html>

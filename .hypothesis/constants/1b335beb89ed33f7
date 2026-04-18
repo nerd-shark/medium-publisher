@@ -1,0 +1,4 @@
+# file: C:\Users\3717246\Repos\Medium\medium_publisher\core\change_parser.py
+# hypothesis_version: 6.148.2
+
+['(?i)^#{2,4}\\s+', 'ChangeParser', 'Found section', 'Identified sections', 'Parsed instruction', 'Parsed instructions', 'Section not found', '\\n#{2,4}\\s+', '\\s*$', '\\s+', 'add', 'context', 'delete', 'end_marker', 'insert_after', 'insert_before', 'line_number', 'replace', 'section_found', 'start_marker', 'update']

@@ -1,0 +1,159 @@
+<mxfile host="65bd71144e">
+    <diagram name="Circuit Breaker Fallback Routing" id="fallback-routing">
+        <mxGraphModel dx="660" dy="655" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="request" value="Incoming Request&#10;Credit Score Calculation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="400" width="180" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="circuit-breaker" value="Circuit&#10;State?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#9999ff;strokeColor=#6666ff;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="300" y="380" width="120" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="primary-container" value="Primary Path" style="swimlane;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;startSize=30;" parent="1" vertex="1">
+                    <mxGeometry x="500" y="50" width="200" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="primary" value="SageMaker ML Model&#10;Full Feature Set" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#99ff99;strokeColor=#82b366;fontSize=11;" parent="primary-container" vertex="1">
+                    <mxGeometry x="25" y="50" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="primary-result" value="850-point score&#10;+ risk factors" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=2;" parent="primary-container" vertex="1">
+                    <mxGeometry x="25" y="115" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="planb1-container" value="Plan B1" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;fontStyle=1;startSize=30;" parent="1" vertex="1">
+                    <mxGeometry x="500" y="230" width="200" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="backup" value="Backup ML Model&#10;Different AZ" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffff99;strokeColor=#d6b656;fontSize=11;" parent="planb1-container" vertex="1">
+                    <mxGeometry x="25" y="50" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="backup-result" value="850-point score&#10;Reduced features" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=2;" parent="planb1-container" vertex="1">
+                    <mxGeometry x="25" y="115" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="planb2-container" value="Plan B2" style="swimlane;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;fontStyle=1;startSize=30;" parent="1" vertex="1">
+                    <mxGeometry x="500" y="410" width="200" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="rules" value="Rules-Based Engine&#10;Business Logic" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffcc99;strokeColor=#d79b00;fontSize=11;" parent="planb2-container" vertex="1">
+                    <mxGeometry x="25" y="50" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="rules-result" value="850-point score&#10;Logic only" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=2;" parent="planb2-container" vertex="1">
+                    <mxGeometry x="25" y="115" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="planb3-container" value="Plan B3" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;fontStyle=1;startSize=30;" parent="1" vertex="1">
+                    <mxGeometry x="800" y="230" width="200" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="cache" value="Cached Historical Score&#10;Last Calculation" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffaa99;strokeColor=#b85450;fontSize=11;" parent="planb3-container" vertex="1">
+                    <mxGeometry x="25" y="50" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="cache-result" value="Last score&#10;+ staleness indicator" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=2;" parent="planb3-container" vertex="1">
+                    <mxGeometry x="25" y="115" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="planb4-container" value="Plan B4" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;fontStyle=1;startSize=30;" parent="1" vertex="1">
+                    <mxGeometry x="800" y="410" width="200" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="manual" value="Manual Review Queue&#10;Human Underwriter" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ff9999;strokeColor=#b85450;fontSize=11;" parent="planb4-container" vertex="1">
+                    <mxGeometry x="25" y="50" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="manual-result" value="Queued for&#10;manual review" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=2;" parent="planb4-container" vertex="1">
+                    <mxGeometry x="25" y="115" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="response" value="Response to Client" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="1100" y="400" width="180" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow-request-cb" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" parent="1" source="request" target="circuit-breaker" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow-cb-primary" value="Closed&#10;Normal" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;fontSize=11;strokeColor=#82b366;" parent="1" source="circuit-breaker" target="primary" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="360" y="130"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow-cb-backup" value="Open&#10;Primary Failed" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;fontSize=11;strokeColor=#d6b656;" parent="1" source="circuit-breaker" target="backup" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow-primary-result" value="Success" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=11;strokeColor=#82b366;" parent="1" source="primary" target="response" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="750" y="130"/>
+                            <mxPoint x="750" y="30"/>
+                            <mxPoint x="1190" y="30"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow-primary-backup" value="Failure" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;fontSize=11;strokeColor=#b85450;dashed=1;dashPattern=8 8;" parent="1" source="primary" target="backup" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow-backup-result" value="Success" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=11;strokeColor=#d6b656;" parent="1" source="backup" target="response" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="750" y="310"/>
+                            <mxPoint x="750" y="580"/>
+                            <mxPoint x="1190" y="580"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow-backup-rules" value="Failure" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;fontSize=11;strokeColor=#b85450;dashed=1;dashPattern=8 8;" parent="1" source="backup" target="rules" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow-rules-result" value="Success" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=11;strokeColor=#d79b00;" parent="1" source="rules" target="response" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="750" y="490"/>
+                            <mxPoint x="750" y="600"/>
+                            <mxPoint x="1190" y="600"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow-rules-cache" value="Failure" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=11;strokeColor=#b85450;dashed=1;dashPattern=8 8;" parent="1" target="cache" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="730" y="470"/>
+                            <mxPoint x="730" y="310"/>
+                        </Array>
+                        <mxPoint x="670" y="470" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow-cache-result" value="Success" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=11;strokeColor=#b85450;" parent="1" source="cache" target="response" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1050" y="310"/>
+                            <mxPoint x="1050" y="440"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow-cache-manual" value="Failure" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;fontSize=11;strokeColor=#b85450;dashed=1;dashPattern=8 8;" parent="1" source="cache" target="manual" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow-manual-result" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#b85450;" parent="1" source="manual" target="response" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1050" y="490"/>
+                            <mxPoint x="1050" y="440"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="legend-title" value="Fallback Hierarchy:" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="600" width="200" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-1" value="1. Primary: Full ML model (best accuracy, highest latency)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="630" width="400" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-2" value="2. Plan B1: Backup ML model (good accuracy, medium latency)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="650" width="400" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-3" value="3. Plan B2: Rules engine (acceptable accuracy, low latency)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="670" width="400" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-4" value="4. Plan B3: Cached score (stale but fast)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="690" width="400" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-5" value="5. Plan B4: Manual queue (slowest but always works)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="710" width="400" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-principle" value="Key Principle: Never return an error. Always provide something." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=3;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="750" width="500" height="30" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

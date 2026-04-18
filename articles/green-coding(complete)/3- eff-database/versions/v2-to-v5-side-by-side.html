@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Optimization: v2 to v5 Side-by-Side Comparison</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .stats {
+            color: #666;
+            font-size: 14px;
+        }
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .version {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .version h2 {
+            margin: 0 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .v2 h2 { border-bottom-color: #ff6b6b; }
+        .v5 h2 { border-bottom-color: #51cf66; }
+        .section {
+            margin-bottom: 30px;
+        }
+        .section-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        .content {
+            line-height: 1.6;
+            color: #555;
+        }
+        .removed {
+            background: #ffe0e0;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .added {
+            background: #d4f4dd;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .changed {
+            background: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .legend {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .legend-item {
+            display: inline-block;
+            margin-right: 20px;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        @media (max-width: 1200px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Database Optimization Article: v2 → v5 Comparison</h1>
+        <div class="stats">
+            <strong>v2:</strong> 2,478 lines | 
+            <strong>v5:</strong> 650 lines | 
+            <strong>Reduction:</strong> 74% shorter
+        </div>
+    </div>
+
+    <div class="legend">
+        <strong>Legend:</strong>
+        <span class="legend-item"><span class="removed">Removed in v5</span></span>
+        <span class="legend-item"><span class="added">Added in v5</span></span>
+        <span class="legend-item"><span class="changed">Changed in v5</span></span>
+    </div>
+
+    <div class="comparison">
+        <div class="version v2">
+            <h2>v2 (Original - 2,478 lines)</h2>
+            
+            <div class="section">
+                <div class="section-title">Introduction</div>
+                <div class="content">
+                    ✓ Keep as-is<br>
+                    Same opening story about PostgreSQL optimization
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Why Databases Are Energy Hogs</div>
+                <div class="content">
+                    <span class="removed">REMOVE: Detailed "How It Works" subsection for each component</span><br>
+                    <span class="removed">REMOVE: Verbose explanations of disk I/O mechanics</span><br>
+                    <span class="removed">REMOVE: Detailed CPU processing breakdown</span><br>
+                    ✓ Keep: Core concepts and energy calculations
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Pattern 1: Index Strategically</div>
+                <div class="content">
+                    ✓ Keep: Problem, Solution, Code Examples<br>
+                    <span class="removed">REMOVE: Detailed "How It Works" section (B-tree explanation)</span><br>
+                    <span class="removed">REMOVE: Monitoring code section</span><br>
+                    <span class="changed">CHANGE: Impact section to inline statement</span>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Pattern 2: Connection Pooling</div>
+                <div class="content">
+                    ✓ Keep: Problem, Solution, Code Examples<br>
+                    <span class="removed">REMOVE: "How It Works" section</span><br>
+                    <span class="removed">REMOVE: Monitoring Pool Health code</span><br>
+                    <span class="changed">CHANGE: Impact section to inline statement</span>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Pattern 3: Query Result Caching</div>
+                <div class="content">
+                    ✓ Keep: Problem, Solution, Code Examples<br>
+                    <span class="removed">REMOVE: "How It Works" section</span><br>
+                    <span class="removed">REMOVE: Cache Invalidation code section</span><br>
+                    <span class="removed">REMOVE: Monitoring Cache Performance code</span><br>
+                    <span class="changed">CHANGE: Impact section to inline statement</span>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Patterns 4-8</div>
+                <div class="content">
+                    Same pattern for each:<br>
+                    <span class="removed">REMOVE: "How It Works" sections</span><br>
+                    <span class="removed">REMOVE: Monitoring code sections</span><br>
+                    <span class="changed">CHANGE: Impact sections to inline statements</span>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Patterns 9-12 (Database Choice)</div>
+                <div class="content">
+                    <span class="removed">Pattern 9: Denormalization (REMOVED)</span><br>
+                    <span class="changed">Pattern 10: Database Type → Combined into new Pattern 9</span><br>
+                    <span class="changed">Pattern 11: Cloud vs On-Prem → Combined into new Pattern 9</span><br>
+                    <span class="changed">Pattern 12: Serverless vs Provisioned → Combined into new Pattern 9</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="version v5">
+            <h2>v5 (Revised - 650 lines)</h2>
+            
+            <div class="section">
+                <div class="section-title">Introduction</div>
+                <div class="content">
+                    ✓ Same as v2<br>
+                    No changes to opening story
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Why Databases Are Energy Hogs</div>
+                <div class="content">
+                    <span class="added">CONDENSED: Single paragraph per component</span><br>
+                    <span class="added">INLINE: Energy calculations integrated into text</span><br>
+                    ✓ Keeps: All core concepts and numbers<br>
+                    ✓ Removes: Redundant explanations
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Pattern 1: Index Strategically</div>
+                <div class="content">
+                    ✓ Same: Problem, Solution, Code Examples<br>
+                    <span class="added">INLINE: B-tree explanation in 2 sentences</span><br>
+                    <span class="added">INLINE: Impact as final paragraph</span><br>
+                    No separate "How It Works" or "Impact" sections
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Pattern 2: Connection Pooling</div>
+                <div class="content">
+                    ✓ Same: Problem, Solution, Code Examples<br>
+                    <span class="added">INLINE: How pooling works in Solution section</span><br>
+                    <span class="added">INLINE: Impact as final paragraph</span><br>
+                    No monitoring code
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Pattern 3: Query Result Caching</div>
+                <div class="content">
+                    ✓ Same: Problem, Solution, Code Examples<br>
+                    <span class="added">INLINE: Cache mechanics in Solution section</span><br>
+                    <span class="added">INLINE: Impact as final paragraph</span><br>
+                    No invalidation or monitoring code
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Patterns 4-8</div>
+                <div class="content">
+                    Same structure for each:<br>
+                    ✓ Problem, Solution, Code Examples<br>
+                    <span class="added">INLINE: Mechanics and impact integrated</span><br>
+                    No separate subsections
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Pattern 9: Choose Right Database & Deployment</div>
+                <div class="content">
+                    <span class="added">NEW: Combined pattern covering:</span><br>
+                    • Database type selection (relational, document, key-value, graph, time-series)<br>
+                    • Cloud vs on-premises tradeoffs<br>
+                    • Serverless vs provisioned models<br>
+                    • Polyglot persistence approach<br>
+                    <span class="added">Keeps all core concepts from original Patterns 10-12</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header">
+        <h1>Key Changes Summary</h1>
+        <div class="content" style="padding: 20px;">
+            <h3>Structural Changes:</h3>
+            <ul>
+                <li><strong>Removed Pattern 9 (Denormalization)</strong> - Not included in v5</li>
+                <li><strong>Combined Patterns 10-12</strong> into new Pattern 9 "Choose Right Database & Deployment"</li>
+                <li><strong>Removed all "How It Works" sections</strong> except Pattern 1 (kept for indexing explanation)</li>
+                <li><strong>Removed all monitoring code sections</strong></li>
+                <li><strong>Converted Impact sections</strong> to inline paragraphs at end of each pattern</li>
+            </ul>
+
+            <h3>Content Preservation:</h3>
+            <ul>
+                <li>✓ All core concepts maintained</li>
+                <li>✓ All code examples kept</li>
+                <li>✓ All energy calculations preserved</li>
+                <li>✓ Narrative flow maintained</li>
+                <li>✓ No bullet-point lists (paragraph-based)</li>
+            </ul>
+
+            <h3>What to Do in Medium Editor:</h3>
+            <ol>
+                <li><strong>Patterns 1-8:</strong> Delete "How It Works" and monitoring code sections, move Impact content inline</li>
+                <li><strong>Pattern 9:</strong> Delete entire Denormalization pattern</li>
+                <li><strong>Patterns 10-12:</strong> Combine into single Pattern 9 with all core concepts</li>
+                <li><strong>Throughout:</strong> Condense verbose explanations while keeping key points</li>
+            </ol>
+        </div>
+    </div>
+
+</body>
+</html>

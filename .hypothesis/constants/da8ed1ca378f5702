@@ -1,0 +1,4 @@
+# file: C:\Users\3717246\Repos\Medium\medium_publisher\utils\logger.py
+# hypothesis_version: 6.148.2
+
+[1024, '%Y-%m-%d %H:%M:%S', '.medium_publisher', 'logs', 'medium_publisher', 'medium_publisher.', 'medium_publisher.log', 'utf-8']

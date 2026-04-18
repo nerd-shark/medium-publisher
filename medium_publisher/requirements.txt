@@ -1,0 +1,45 @@
+# Medium Article Publisher - Dependencies
+
+# UI Framework
+PyQt6==6.6.1
+PyQt6-Qt6==6.6.1
+PyQt6-sip==13.6.0
+
+# OS-Level Input Control
+pyautogui==0.9.54
+pynput==1.7.7
+
+# Image Processing (Screen Recognition)
+Pillow==10.2.0
+
+# Browser Cookie Extraction (Windows)
+pywin32==306
+pycryptodome==3.20.0
+
+# Markdown Processing
+markdown2==2.4.12
+PyYAML==6.0.1
+
+# Configuration Management
+python-dotenv==1.0.1
+
+# Secure Credential Storage
+keyring==24.3.0
+
+# Async Support
+asyncio==3.4.3
+
+# Testing
+pytest==7.4.4
+pytest-asyncio==0.23.3
+pytest-qt==4.3.1
+pytest-cov==4.1.0
+hypothesis==6.98.0
+
+# Code Quality
+black==24.1.1
+ruff==0.1.14
+mypy==1.8.0
+
+# Type Stubs
+types-PyYAML==6.0.12.12

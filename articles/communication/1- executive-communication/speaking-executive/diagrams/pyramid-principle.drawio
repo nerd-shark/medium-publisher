@@ -1,0 +1,92 @@
+<mxfile host="app.diagrams.net" modified="2025-02-08T00:00:00.000Z" agent="AI Agent" version="22.1.16">
+  <diagram name="Pyramid Principle" id="pyramid-principle">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        
+        <!-- Title -->
+        <mxCell id="title" value="The Pyramid Principle: Start With The Answer" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="334.5" y="40" width="500" height="40" as="geometry"/>
+        </mxCell>
+        
+        <!-- Left Side: Engineer's Instinct (Bottom-Up) -->
+        <mxCell id="left-title" value="Engineer's Instinct (Bottom-Up)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="80" y="120" width="300" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="left-icon" value="❌" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=40;" vertex="1" parent="1">
+          <mxGeometry x="200" y="160" width="60" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- Bottom-Up Steps -->
+        <mxCell id="step5" value="5. Here's why" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;opacity=40;" vertex="1" parent="1">
+          <mxGeometry x="130" y="580" width="200" height="40" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="step4" value="4. Here's what we recommend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;opacity=50;" vertex="1" parent="1">
+          <mxGeometry x="130" y="520" width="200" height="40" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="step3" value="3. Here's what we found" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;opacity=60;" vertex="1" parent="1">
+          <mxGeometry x="130" y="460" width="200" height="40" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="step2" value="2. Here's what we investigated" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;opacity=70;" vertex="1" parent="1">
+          <mxGeometry x="130" y="400" width="200" height="40" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="step1" value="1. Here's the problem" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;opacity=80;" vertex="1" parent="1">
+          <mxGeometry x="130" y="340" width="200" height="40" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="left-note" value="Executive checks phone&#xa;after 30 seconds" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=2;fontColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="130" y="640" width="200" height="40" as="geometry"/>
+        </mxCell>
+        
+        <!-- Right Side: Executive's Preference (Top-Down) -->
+        <mxCell id="right-title" value="Executive's Preference (Top-Down)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="789" y="120" width="300" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="right-icon" value="✓" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=40;fontColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="909" y="160" width="60" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- Top-Down Pyramid -->
+        <mxCell id="pyramid1" value="1. Here's what we recommend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="789" y="240" width="300" height="50" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="pyramid2" value="2. Here's why (business impact)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="769" y="310" width="340" height="50" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="pyramid3" value="3. Here's the risk and mitigation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="749" y="380" width="380" height="50" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="pyramid4" value="4. Here's what we need" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="729" y="450" width="420" height="50" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="pyramid5" value="5. Details available if asked" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;opacity=60;" vertex="1" parent="1">
+          <mxGeometry x="709" y="520" width="460" height="50" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="right-note" value="Executive leans forward" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=2;fontColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="839" y="590" width="200" height="40" as="geometry"/>
+        </mxCell>
+        
+        <!-- Center Arrow -->
+        <mxCell id="arrow" value="Transform Your&#xa;Communication" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=3;fontSize=14;fontStyle=1;strokeColor=#666666;fillColor=#f5f5f5;" edge="1" parent="1" source="step3" target="pyramid3">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="400" y="405" as="sourcePoint"/>
+            <mxPoint x="700" y="405" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

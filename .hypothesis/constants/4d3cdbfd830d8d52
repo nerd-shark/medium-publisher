@@ -1,0 +1,4 @@
+# file: C:\Users\3717246\Repos\Medium\medium_publisher\ui\settings_dialog.py
+# hypothesis_version: 6.148.2
+
+[0.0, 0.05, 0.1, 0.7, 0.8, 1.0, 100, 200, 520, 1000, ' %', ' ms', ' s', '(Not set)', 'Browse...', 'Countdown duration:', 'Keep window on top', 'Navigation', 'Paths', 'Safety', 'Settings', 'Settings loaded', 'Settings saved', 'Speed variation (±):', 'Typing', 'Typo frequency:', 'UI', 'ctrl+shift+escape', 'high', 'low', 'medium', 'typing.base_delay_ms', 'ui.always_on_top', 'user@gmail.com']

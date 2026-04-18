@@ -1,0 +1,149 @@
+<mxfile host="65bd71144e">
+    <diagram name="Complete System" id="complete-system">
+        <mxGraphModel dx="550" dy="546" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="client" value="Client Request&#10;Borrower ID: 12345" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="600" y="40" width="200" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="router" value="Consistent Hash Router&#10;hash % 3 = Cell 2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="600" y="150" width="200" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="cell2-container" value="Cell 2: Borrowers 10,001-20,000" style="swimlane;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;fontStyle=1;startSize=40;" parent="1" vertex="1">
+                    <mxGeometry x="400" y="280" width="600" height="650" as="geometry"/>
+                </mxCell>
+                <mxCell id="alb2" value="Load Balancer" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="cell2-container" vertex="1">
+                    <mxGeometry x="250" y="60" width="100" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="app-container" value="Application Layer" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;fontStyle=1;startSize=30;" parent="cell2-container" vertex="1">
+                    <mxGeometry x="200" y="150" width="200" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="app2" value="Credit Risk Service&#10;EKS Pod" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" parent="app-container" vertex="1">
+                    <mxGeometry x="25" y="40" width="150" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="cb-container" value="Circuit Breakers" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;fontStyle=1;startSize=30;" parent="cell2-container" vertex="1">
+                    <mxGeometry x="50" y="300" width="500" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="cb-ml" value="ML Circuit&#10;3 failures&#10;30s timeout" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffcccc;strokeColor=#ff0000;strokeWidth=2;fontSize=10;fontStyle=1;" parent="cb-container" vertex="1">
+                    <mxGeometry x="30" y="40" width="100" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="cb-db" value="DB Circuit&#10;5 failures&#10;60s timeout" style="rhombus;whiteSpace=wrap;html=1;fillColor=#99ff99;strokeColor=#82b366;fontSize=10;fontStyle=1;" parent="cb-container" vertex="1">
+                    <mxGeometry x="200" y="40" width="100" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="cb-cache" value="Cache Circuit&#10;2 failures&#10;15s timeout" style="rhombus;whiteSpace=wrap;html=1;fillColor=#99ff99;strokeColor=#82b366;fontSize=10;fontStyle=1;" parent="cb-container" vertex="1">
+                    <mxGeometry x="370" y="40" width="100" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="primary-container" value="Primary Dependencies" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;fontStyle=1;startSize=30;" parent="cell2-container" vertex="1">
+                    <mxGeometry x="50" y="460" width="220" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="ml2" value="SageMaker&#10;Endpoint" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ff9999;strokeColor=#b85450;fontSize=11;" parent="primary-container" vertex="1">
+                    <mxGeometry x="10" y="40" width="60" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="db2" value="RDS&#10;Instance" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#99ff99;strokeColor=#82b366;fontSize=11;" parent="primary-container" vertex="1">
+                    <mxGeometry x="80" y="40" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="cache2" value="ElastiCache&#10;Cluster" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#99ff99;strokeColor=#82b366;fontSize=11;" parent="primary-container" vertex="1">
+                    <mxGeometry x="150" y="40" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="fallback-container" value="Fallback Dependencies" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;fontStyle=1;startSize=30;" parent="cell2-container" vertex="1">
+                    <mxGeometry x="340" y="460" width="220" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="ml-backup" value="Backup ML&#10;Model" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffff99;strokeColor=#d6b656;fontSize=11;" parent="fallback-container" vertex="1">
+                    <mxGeometry x="10" y="40" width="60" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="db-replica" value="Read&#10;Replica" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;" parent="fallback-container" vertex="1">
+                    <mxGeometry x="80" y="40" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="db-direct" value="Direct DB&#10;No Cache" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;" parent="fallback-container" vertex="1">
+                    <mxGeometry x="150" y="40" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="cell1" value="Cell 1&#10;Borrowers 1-10,000&#10;&#10;Healthy ✓" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="400" width="200" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="cell3" value="Cell 3&#10;Borrowers 20,001-30,000&#10;&#10;Healthy ✓" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="1150" y="400" width="200" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow-client-router" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" parent="1" source="client" target="router" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow-router-alb" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" parent="1" source="router" target="alb2" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow-alb-app" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" parent="1" source="alb2" target="app2" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow-app-cbml" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" parent="1" source="app2" target="cb-ml" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow-app-cbdb" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" parent="1" source="app2" target="cb-db" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow-app-cbcache" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" parent="1" source="app2" target="cb-cache" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow-cbml-ml" value="Closed" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;strokeColor=#82b366;dashed=1;dashPattern=8 8;" parent="1" source="cb-ml" target="ml2" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow-cbdb-db" value="Closed" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;strokeColor=#82b366;" parent="1" source="cb-db" target="db2" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="700" y="720"/>
+                            <mxPoint x="560" y="720"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow-cbcache-cache" value="Closed" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;strokeColor=#82b366;" parent="1" source="cb-cache" target="cache2" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="870" y="730"/>
+                            <mxPoint x="630" y="730"/>
+                        </Array>
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow-cbml-backup" value="Open" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;strokeColor=#ff0000;" parent="1" source="cb-ml" target="ml-backup" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="530" y="710"/>
+                            <mxPoint x="780" y="710"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow-cbdb-replica" value="Open" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;strokeColor=#d79b00;dashed=1;dashPattern=8 8;" parent="1" source="cb-db" target="db-replica" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="850" y="690"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow-cbcache-direct" value="Open" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;strokeColor=#d79b00;dashed=1;dashPattern=8 8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="cb-cache" target="db-direct" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="920" y="760"/>
+                            <mxPoint x="920" y="760"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="legend-title" value="System Behavior:" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="950" width="200" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-1" value="• Request routed to Cell 2 via consistent hashing" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="980" width="400" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-2" value="• ML Circuit is OPEN (red) → routes to backup ML model" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="1000" width="400" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-3" value="• DB Circuit is CLOSED (green) → uses primary database" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="1020" width="400" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-4" value="• Cache Circuit is CLOSED (green) → uses primary cache" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="1040" width="400" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-5" value="• Cell 1 and Cell 3 unaffected by Cell 2's ML issues" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="1060" width="400" height="20" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

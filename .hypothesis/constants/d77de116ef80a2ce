@@ -1,0 +1,4 @@
+# file: C:\Users\3717246\Repos\Medium\medium_publisher\automation\content_typer.py
+# hypothesis_version: 6.148.2
+
+[0.7, 1000.0, 2000.0, 100, 200, 500, 2000, '* ', '1', '1. ', '2', '5', 'Review pass complete', 'Typing subtitle', 'Typing title: %s', '[image]', '[table]', '`', '```', 'alt', 'alt_text', 'b', 'backspace', 'bold', 'bullet', 'caption', 'code', 'ctrl', 'enter', 'escape', 'f', 'header', 'home', 'i', 'image_placeholder', 'italic', 'k', 'link', 'list', 'list_type', 'ordered', 'paragraph', 'quote', 'right', 'table_placeholder', 'typing.base_delay_ms']

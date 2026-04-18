@@ -1,0 +1,4 @@
+# file: C:\Users\3717246\Repos\Medium\medium_publisher\core\markdown_processor.py
+# hypothesis_version: 6.148.2
+
+['!\\[(.+?)\\]\\((.+?)\\)', 'MarkdownProcessor', '\\*\\*(.+?)\\*\\*', '\\[(.+?)\\]\\((.+?)\\)', '^(#{2,4})\\s+(.+)$', '^\\s*[-*]\\s+.+', '^\\s*\\d+\\.', '^\\s*\\d+\\.\\s+.+', '^\\s*\\|.+\\|\\s*$', '_(.+?)_', '`(.+?)`', '```', 'added', 'alt_text', 'bold', 'bullet', 'code', 'columns', 'deleted', 'header', 'image_placeholder', 'introduction', 'italic', 'language', 'link', 'list', 'list_type', 'modified', 'numbered', 'paragraph', 'table_placeholder', 'url', '|']

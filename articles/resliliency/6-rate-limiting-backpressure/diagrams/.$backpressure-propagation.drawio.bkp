@@ -1,0 +1,204 @@
+<mxfile host="app.diagrams.net" modified="2026-03-29T00:00:00.000Z" agent="draw.io" version="24.0.0" type="device">
+  <diagram id="backpressure" name="Backpressure Propagation: Without vs With">
+    <mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <!-- Title -->
+        <mxCell id="title" value="Backpressure Propagation Through a Service Chain" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=22;fontStyle=1;fontColor=#1a1a2e;" vertex="1" parent="1">
+          <mxGeometry x="350" y="15" width="900" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== LEFT SIDE: WITHOUT BACKPRESSURE ==================== -->
+        <mxCell id="left_title" value="❌ WITHOUT Backpressure" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=18;fontStyle=1;fontColor=#cc0000;" vertex="1" parent="1">
+          <mxGeometry x="180" y="65" width="340" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="left_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#e57373;strokeWidth=2;dashed=1;opacity=30;" vertex="1" parent="1">
+          <mxGeometry x="40" y="100" width="700" height="850" as="geometry" />
+        </mxCell>
+
+        <!-- Left: Client -->
+        <mxCell id="l_client" value="&lt;b&gt;Client&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;Sends requests&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="280" y="120" width="140" height="50" as="geometry" />
+        </mxCell>
+        <!-- Left: Service A -->
+        <mxCell id="l_svcA" value="&lt;b&gt;Service A&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;Thread pool filling...&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="280" y="230" width="140" height="50" as="geometry" />
+        </mxCell>
+        <!-- Left: Service B -->
+        <mxCell id="l_svcB" value="&lt;b&gt;Service B&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;Thread pool filling...&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="280" y="340" width="140" height="50" as="geometry" />
+        </mxCell>
+        <!-- Left: Service C -->
+        <mxCell id="l_svcC" value="&lt;b&gt;Service C&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;Waiting on DB...&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="280" y="450" width="140" height="50" as="geometry" />
+        </mxCell>
+        <!-- Left: Database -->
+        <mxCell id="l_db" value="&lt;b&gt;Database&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;⚠️ SLOW — overloaded&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="290" y="555" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Left arrows: requests keep flowing down -->
+        <mxCell id="l_arr1" value="requests" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#333333;endArrow=classic;endFill=1;fontSize=10;" edge="1" parent="1" source="l_client" target="l_svcA">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l_arr2" value="requests" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#333333;endArrow=classic;endFill=1;fontSize=10;" edge="1" parent="1" source="l_svcA" target="l_svcB">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l_arr3" value="requests" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#333333;endArrow=classic;endFill=1;fontSize=10;" edge="1" parent="1" source="l_svcB" target="l_svcC">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l_arr4" value="queries" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#333333;endArrow=classic;endFill=1;fontSize=10;" edge="1" parent="1" source="l_svcC" target="l_db">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Left: Cascade failure sequence -->
+        <mxCell id="l_fail_c" value="💀 C crashes (OOM)" style="text;html=1;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontSize=12;fontStyle=1;fontColor=#cc0000;" vertex="1" parent="1">
+          <mxGeometry x="440" y="460" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="l_fail_b" value="💀 B crashes (threads exhausted)" style="text;html=1;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontSize=12;fontStyle=1;fontColor=#cc0000;" vertex="1" parent="1">
+          <mxGeometry x="440" y="350" width="280" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="l_fail_a" value="💀 A crashes (threads exhausted)" style="text;html=1;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontSize=12;fontStyle=1;fontColor=#cc0000;" vertex="1" parent="1">
+          <mxGeometry x="440" y="240" width="280" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="l_fail_client" value="💀 Client: connection timeout" style="text;html=1;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontSize=12;fontStyle=1;fontColor=#cc0000;" vertex="1" parent="1">
+          <mxGeometry x="440" y="130" width="280" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Left: Timeline -->
+        <mxCell id="l_time" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#999999;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="100" y="130" as="sourcePoint" />
+            <mxPoint x="100" y="600" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="l_t0" value="t=0s" style="text;html=1;align=right;verticalAlign=middle;strokeColor=none;fillColor=none;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="55" y="555" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="l_t30" value="t=30s" style="text;html=1;align=right;verticalAlign=middle;strokeColor=none;fillColor=none;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="55" y="450" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="l_t60" value="t=60s" style="text;html=1;align=right;verticalAlign=middle;strokeColor=none;fillColor=none;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="55" y="340" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="l_t90" value="t=90s" style="text;html=1;align=right;verticalAlign=middle;strokeColor=none;fillColor=none;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="55" y="230" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="l_t180" value="t=180s" style="text;html=1;align=right;verticalAlign=middle;strokeColor=none;fillColor=none;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="50" y="130" width="45" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="l_time_label" value="TIME →" style="text;html=1;align=center;verticalAlign=middle;strokeColor=none;fillColor=none;fontSize=10;fontStyle=1;fontColor=#999999;rotation=-90;" vertex="1" parent="1">
+          <mxGeometry x="70" y="370" width="60" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Left: Result box -->
+        <mxCell id="l_result" value="&lt;b&gt;RESULT: Total outage for 4+ hours&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot;&gt;All services down • All users affected&lt;br&gt;Manual restart required • Data loss risk&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6194b;strokeColor=#990000;strokeWidth=2;fontSize=13;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="110" y="660" width="480" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== RIGHT SIDE: WITH BACKPRESSURE ==================== -->
+        <mxCell id="right_title" value="✅ WITH Backpressure" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=18;fontStyle=1;fontColor=#2d6a2e;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="65" width="300" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="right_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#81c784;strokeWidth=2;dashed=1;opacity=30;" vertex="1" parent="1">
+          <mxGeometry x="860" y="100" width="700" height="850" as="geometry" />
+        </mxCell>
+
+        <!-- Right: Client -->
+        <mxCell id="r_client" value="&lt;b&gt;Client&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;Gets 429 + Retry-After&lt;br&gt;Waits, retries later&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="120" width="140" height="60" as="geometry" />
+        </mxCell>
+        <!-- Right: Service A -->
+        <mxCell id="r_svcA" value="&lt;b&gt;Service A&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;Circuit breaker OPEN for B&lt;br&gt;Returns 503 to client&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="240" width="140" height="60" as="geometry" />
+        </mxCell>
+        <!-- Right: Service B -->
+        <mxCell id="r_svcB" value="&lt;b&gt;Service B&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;Circuit breaker OPEN for C&lt;br&gt;Returns 503 to A&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="360" width="140" height="60" as="geometry" />
+        </mxCell>
+        <!-- Right: Service C -->
+        <mxCell id="r_svcC" value="&lt;b&gt;Service C&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;Returns 503 + Retry-After&lt;br&gt;Stops sending queries&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="480" width="140" height="60" as="geometry" />
+        </mxCell>
+        <!-- Right: Database -->
+        <mxCell id="r_db" value="&lt;b&gt;Database&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;⚠️ SLOW — but recovering&lt;br&gt;(load reduced)&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="590" width="120" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Right: Backpressure signals flowing UP (503 responses) -->
+        <mxCell id="r_bp1" value="&lt;font color=&quot;#cc0000&quot;&gt;503&lt;/font&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=3;strokeColor=#cc0000;endArrow=classic;endFill=1;fontSize=11;fontStyle=1;exitX=1;exitY=0.25;entryX=1;entryY=0.75;dashed=1;dashPattern=6 3;" edge="1" parent="1" source="r_db" target="r_svcC">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1300" y="605" />
+              <mxPoint x="1300" y="525" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_bp2" value="&lt;font color=&quot;#cc0000&quot;&gt;503&lt;/font&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=3;strokeColor=#cc0000;endArrow=classic;endFill=1;fontSize=11;fontStyle=1;exitX=1;exitY=0.25;entryX=1;entryY=0.75;dashed=1;dashPattern=6 3;" edge="1" parent="1" source="r_svcC" target="r_svcB">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1310" y="495" />
+              <mxPoint x="1310" y="405" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_bp3" value="&lt;font color=&quot;#cc0000&quot;&gt;503&lt;/font&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=3;strokeColor=#cc0000;endArrow=classic;endFill=1;fontSize=11;fontStyle=1;exitX=1;exitY=0.25;entryX=1;entryY=0.75;dashed=1;dashPattern=6 3;" edge="1" parent="1" source="r_svcB" target="r_svcA">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1320" y="375" />
+              <mxPoint x="1320" y="285" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_bp4" value="&lt;font color=&quot;#cc0000&quot;&gt;429 + Retry-After: 30s&lt;/font&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=3;strokeColor=#cc0000;endArrow=classic;endFill=1;fontSize=11;fontStyle=1;exitX=1;exitY=0.25;entryX=1;entryY=0.75;dashed=1;dashPattern=6 3;" edge="1" parent="1" source="r_svcA" target="r_client">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1340" y="255" />
+              <mxPoint x="1340" y="165" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Right: Reduced traffic flowing down (green, thin) -->
+        <mxCell id="r_arr1" value="&lt;font color=&quot;#2d6a2e&quot;&gt;reduced traffic&lt;/font&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1;strokeColor=#82b366;endArrow=classic;endFill=1;fontSize=10;dashed=1;" edge="1" parent="1" source="r_client" target="r_svcA">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r_arr2" value="&lt;font color=&quot;#2d6a2e&quot;&gt;blocked&lt;/font&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1;strokeColor=#82b366;endArrow=classic;endFill=1;fontSize=10;dashed=1;" edge="1" parent="1" source="r_svcA" target="r_svcB">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r_arr3" value="&lt;font color=&quot;#2d6a2e&quot;&gt;blocked&lt;/font&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1;strokeColor=#82b366;endArrow=classic;endFill=1;fontSize=10;dashed=1;" edge="1" parent="1" source="r_svcB" target="r_svcC">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r_arr4" value="&lt;font color=&quot;#2d6a2e&quot;&gt;no queries&lt;/font&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1;strokeColor=#82b366;endArrow=classic;endFill=1;fontSize=10;dashed=1;" edge="1" parent="1" source="r_svcC" target="r_db">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Right: Status annotations -->
+        <mxCell id="r_status_c" value="✅ C stays alive" style="text;html=1;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontSize=12;fontStyle=1;fontColor=#2d6a2e;" vertex="1" parent="1">
+          <mxGeometry x="920" y="495" width="160" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="r_status_b" value="✅ B stays alive" style="text;html=1;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontSize=12;fontStyle=1;fontColor=#2d6a2e;" vertex="1" parent="1">
+          <mxGeometry x="920" y="375" width="160" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="r_status_a" value="✅ A stays alive" style="text;html=1;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontSize=12;fontStyle=1;fontColor=#2d6a2e;" vertex="1" parent="1">
+          <mxGeometry x="920" y="255" width="160" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="r_status_client" value="✅ Client waits 30s, retries" style="text;html=1;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontSize=12;fontStyle=1;fontColor=#2d6a2e;" vertex="1" parent="1">
+          <mxGeometry x="920" y="135" width="180" height="25" as="geometry" />
+        </mxCell>
+
+        <!-- Right: Result box -->
+        <mxCell id="r_result" value="&lt;b&gt;RESULT: Temporary degradation for ~30 seconds&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot;&gt;Some requests delayed • No crashes • No data loss&lt;br&gt;System self-recovers when DB catches up&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2d6a2e;strokeColor=#1b5e20;strokeWidth=2;fontSize=13;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="920" y="660" width="480" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Backpressure label -->
+        <mxCell id="bp_label" value="⬆ Backpressure signals flow UP" style="text;html=1;align=center;verticalAlign=middle;strokeColor=none;fillColor=none;fontSize=12;fontStyle=3;fontColor=#cc0000;" vertex="1" parent="1">
+          <mxGeometry x="1300" y="440" width="220" height="25" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
