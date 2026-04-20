@@ -235,8 +235,30 @@ class PublishingWorkflow:
         results: List[PublishingResult] = []
         total = len(file_paths)
 
+        # Check for resume state before starting a new session
+        prev_state = self._session.restore_state()
+        prev_title = prev_state.get("article_title", "")
+        prev_block = prev_state.get("last_typed_block_index", -1)
+
         self._session.start_session()
         self._session.set_batch_articles(file_paths)
+
+        # Peek at the first article's title to check for resume match
+        resume_title = ""
+        if file_paths and prev_block > 0 and prev_title:
+            try:
+                first_article = self._parser.parse_file(file_paths[0])
+                resume_title = first_article.title
+            except Exception:
+                resume_title = ""
+
+        if prev_block > 0 and prev_title and prev_title == resume_title:
+            self._session.set_article_title(prev_title)
+            self._session.set_last_typed_block_index(prev_block)
+            logger.info(
+                "Resume state carried forward: article='%s', block=%d",
+                prev_title, prev_block,
+            )
 
         for idx, fpath in enumerate(file_paths):
             if article_cb:
@@ -263,7 +285,11 @@ class PublishingWorkflow:
                     status_cb("Pausing before next article...")
                 time.sleep(2)
 
-        self._session.clear_session()
+        # Only clear session if all articles succeeded (preserve for resume otherwise)
+        if all(r.success for r in results):
+            self._session.clear_session()
+        else:
+            logger.info("Session preserved for potential resume (some articles failed)")
         return results
 
     # ------------------------------------------------------------------
@@ -423,7 +449,25 @@ class PublishingWorkflow:
                         file_path=file_path,
                     )
 
-            # 3. Type article
+            # 3. Check for resume point (match by article title, not file path)
+            state = self._session.get_current_state()
+            resume_block = -1
+            saved_title = state.get("article_title", "")
+            saved_block = state.get("last_typed_block_index", -1)
+            if saved_title and saved_title == article.title and saved_block >= 0:
+                resume_block = saved_block
+                logger.info(
+                    "Resuming article '%s' from block %d (previously saved)",
+                    saved_title, resume_block,
+                )
+                if status_cb:
+                    status_cb(f"Resuming from block {resume_block + 1} of {len(blocks)}...")
+
+            # Save article identity for future resume
+            self._session.set_article_title(article.title)
+            self._session.set_article_path(file_path)
+
+            # 4. Type article
             if status_cb:
                 status_cb("Typing article...")
             placeholders = self._type_article_with_progress(
@@ -431,6 +475,7 @@ class PublishingWorkflow:
                 article.subtitle,
                 blocks,
                 block_cb,
+                resume_from_block=resume_block,
             )
 
             if placeholders_cb and placeholders:
@@ -485,17 +530,36 @@ class PublishingWorkflow:
         subtitle: str,
         blocks: List[ContentBlock],
         block_cb: Optional[Callable[[int, int], None]],
+        resume_from_block: int = -1,
     ) -> List[str]:
-        """Type article blocks and return placeholder list."""
+        """Type article blocks and return placeholder list.
+
+        Args:
+            title: Article title.
+            subtitle: Article subtitle.
+            blocks: Content blocks to type.
+            block_cb: Progress callback.
+            resume_from_block: If >= 0, skip title/subtitle and blocks
+                up to (and including) this index, resuming from the next one.
+        """
         total = len(blocks)
         placeholders: List[str] = []
 
-        # Title (first block or explicit)
-        self._typer.type_title(title)
-        if subtitle:
-            self._typer.type_subtitle(subtitle)
+        if resume_from_block >= 0:
+            start_idx = resume_from_block + 1
+            logger.info(
+                "Resuming from block %d of %d (skipping title and %d blocks)",
+                start_idx, total, start_idx,
+            )
+        else:
+            start_idx = 0
+            # Title (first block or explicit)
+            self._typer.type_title(title)
+            if subtitle:
+                self._typer.type_subtitle(subtitle)
 
-        for idx, block in enumerate(blocks):
+        for idx in range(start_idx, total):
+            block = blocks[idx]
             if block_cb:
                 block_cb(idx + 1, total)
             self._session.set_last_typed_block_index(idx)

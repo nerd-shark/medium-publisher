@@ -7,6 +7,7 @@ and deferred correction, and a review pass for deferred typos.
 """
 
 import random
+import re
 import time
 from typing import List, Optional
 
@@ -41,7 +42,7 @@ class ContentTyper:
         self._tracker = typo_tracker
         self._config = config
 
-        self._base_delay_ms: int = config.get("typing.base_delay_ms", 200)
+        self._base_delay_ms: int = config.get("typing.base_delay_ms", 50)
         self._immediate_ratio: float = config.get(
             "typing.immediate_correction_ratio", 0.70
         )
@@ -96,10 +97,12 @@ class ContentTyper:
         self._input.press_key("enter")
 
     def type_subtitle(self, subtitle: str) -> None:
-        """Type subtitle, apply Subheader format (Ctrl+Alt+2), press Enter."""
+        """Type subtitle text and press Enter.
+
+        In Medium's editor, the line immediately after the title is
+        automatically treated as the subtitle — no special formatting needed.
+        """
         logger.info("Typing subtitle")
-        self._input.hotkey("ctrl", "alt", "2")
-        self._delay()
         self._type_with_typos(subtitle)
         self._input.press_key("enter")
 
@@ -195,22 +198,37 @@ class ContentTyper:
             segment = text[fmt.start : fmt.end]
 
             if fmt.type == "code":
-                # Inline code: backtick, text, backtick
+                # Inline code: extract text between backticks
+                inner = re.search(r'`(.+?)`', segment)
+                code_text = inner.group(1) if inner else segment
                 self._type_with_typos("`", allow_typos=False)
-                self._type_with_typos(segment, allow_typos=False)
+                self._type_with_typos(code_text, allow_typos=False)
                 self._type_with_typos("`", allow_typos=False)
             elif fmt.type == "link":
-                self.type_link(segment, fmt.url)
+                # Extract link text and URL from [text](url)
+                link_match = re.search(r'\[(.+?)\]\((.+?)\)', segment)
+                if link_match:
+                    link_text = link_match.group(1)
+                    link_url = fmt.url or link_match.group(2)
+                    self.type_link(link_text, link_url)
+                else:
+                    self.type_link(segment, fmt.url)
             elif fmt.type == "bold":
-                self._type_with_typos(segment)
-                self._input.select_text_backwards(len(segment))
+                # Extract text between ** markers
+                inner = re.search(r'\*\*(.+?)\*\*', segment)
+                bold_text = inner.group(1) if inner else segment
+                self._type_with_typos(bold_text)
+                self._input.select_text_backwards(len(bold_text))
                 self._delay()
                 self._input.hotkey("ctrl", "b")
                 self._delay()
                 self._input.press_key("right")
             elif fmt.type == "italic":
-                self._type_with_typos(segment)
-                self._input.select_text_backwards(len(segment))
+                # Extract text between * or _ markers
+                inner = re.search(r'[*_](.+?)[*_]', segment)
+                italic_text = inner.group(1) if inner else segment
+                self._type_with_typos(italic_text)
+                self._input.select_text_backwards(len(italic_text))
                 self._delay()
                 self._input.hotkey("ctrl", "i")
                 self._delay()
@@ -286,7 +304,7 @@ class ContentTyper:
             self._delay()
 
             # Simulate reading pause
-            pause_ms = random.randint(500, 2000)
+            pause_ms = random.randint(200, 800)
             time.sleep(pause_ms / 1000.0)
 
             # Select the wrong character and replace with correct one
@@ -412,4 +430,4 @@ class ContentTyper:
         Args:
             ms: Milliseconds to sleep. Defaults to 50.
         """
-        time.sleep((ms or 50) / 1000.0)
+        time.sleep((ms or 20) / 1000.0)

@@ -71,6 +71,7 @@ class SessionManager:
             "session_id": datetime.now().isoformat(),
             "started_at": datetime.now().isoformat(),
             "current_version": None,
+            "article_title": None,
             "article_path": None,
             "draft_url": None,
             "versions_completed": [],
@@ -233,6 +234,19 @@ class SessionManager:
         """
         self.save_state({"article_path": path})
         self.logger.debug(f"Article path set: {path}")
+
+    def set_article_title(self, title: str) -> None:
+        """Set current article title (used to match sessions across version files).
+
+        Args:
+            title: Article title from YAML frontmatter
+        """
+        self.save_state({"article_title": title})
+        self.logger.debug(f"Article title set: {title}")
+    
+    def get_article_title(self) -> Optional[str]:
+        """Get the article title from the current session."""
+        return self._current_state.get("article_title")
     
     def set_draft_url(self, url: Optional[str]) -> None:
         """Set Medium draft URL.

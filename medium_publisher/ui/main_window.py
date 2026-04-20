@@ -22,6 +22,8 @@ from PyQt6.QtWidgets import (
     QMainWindow,
     QMessageBox,
     QPushButton,
+    QScrollArea,
+    QSizePolicy,
     QTextEdit,
     QVBoxLayout,
     QWidget,
@@ -145,19 +147,43 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Medium Keyboard Publisher")
         self.setMinimumSize(700, 520)
 
-        central = QWidget()
-        self.setCentralWidget(central)
-        root = QVBoxLayout(central)
+        # Scroll area wrapping all content
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setCentralWidget(scroll)
 
-        root.addWidget(self._build_file_group())
-        root.addWidget(self._build_draft_url_group())
-        root.addWidget(self._build_version_update_group())
-        root.addWidget(self._build_article_info_group())
-        root.addWidget(self._build_countdown_group())
-        root.addWidget(self._build_actions_group())
+        container = QWidget()
+        root = QVBoxLayout(container)
+        root.setSpacing(6)
+
+        file_group = self._build_file_group()
+        file_group.setFixedHeight(90)
+        root.addWidget(file_group)
+
+        draft_group = self._build_draft_url_group()
+        draft_group.setFixedHeight(80)
+        root.addWidget(draft_group)
+
+        version_group = self._build_version_update_group()
+        version_group.setFixedHeight(200)
+        root.addWidget(version_group)
+
+        article_group = self._build_article_info_group()
+        article_group.setFixedHeight(120)
+        root.addWidget(article_group)
+
+        countdown_group = self._build_countdown_group()
+        countdown_group.setFixedHeight(60)
+        root.addWidget(countdown_group)
+
+        actions_group = self._build_actions_group()
+        actions_group.setFixedHeight(100)
+        root.addWidget(actions_group)
 
         # Progress widget
         self.progress_widget = ProgressWidget(self)
+        self.progress_widget.setFixedHeight(200)
         root.addWidget(self.progress_widget)
 
         # Always-on-top toggle
@@ -165,6 +191,11 @@ class MainWindow(QMainWindow):
         self.always_on_top_cb.setChecked(self.config.get("ui.always_on_top", True))
         self.always_on_top_cb.toggled.connect(self._on_always_on_top_toggled)
         root.addWidget(self.always_on_top_cb)
+
+        # Push content to top, don't stretch
+        root.addStretch(1)
+
+        scroll.setWidget(container)
 
         self.statusBar().showMessage("Ready")
 
@@ -630,6 +661,14 @@ class MainWindow(QMainWindow):
         self.settings_btn.clicked.connect(self._on_open_settings)
         layout.addWidget(self.settings_btn)
 
+        self.clear_session_btn = QPushButton("Clear Session")
+        self.clear_session_btn.setToolTip(
+            "Clear saved progress so the next run starts from the beginning.\n"
+            "Use this when you want to retype an article from scratch."
+        )
+        self.clear_session_btn.clicked.connect(self._on_clear_session)
+        layout.addWidget(self.clear_session_btn)
+
         outer.addLayout(layout)
         group.setLayout(outer)
         return group
@@ -748,6 +787,34 @@ class MainWindow(QMainWindow):
         dialog = SettingsDialog(self.config, self)
         if dialog.exec() == SettingsDialog.DialogCode.Accepted:
             self.status_changed.emit("Settings saved")
+
+    def _on_clear_session(self) -> None:
+        """Clear saved session so the next run starts from the beginning."""
+        if self._session_manager is None:
+            self.statusBar().showMessage("No session manager available")
+            return
+
+        state = self._session_manager.get_current_state()
+        article_title = state.get("article_title", "unknown article")
+        last_block = state.get("last_typed_block_index", 0)
+
+        if not state or last_block <= 0:
+            self.statusBar().showMessage("No active session to clear")
+            return
+
+        reply = QMessageBox.question(
+            self,
+            "Clear Session",
+            f"Clear saved progress for \"{article_title}\"?\n"
+            f"(Currently at block {last_block})\n\n"
+            "The next run will start from the beginning.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+        if reply == QMessageBox.StandardButton.Yes:
+            self._session_manager.clear_session()
+            self.statusBar().showMessage(f"Session cleared for \"{article_title}\"")
+            logger.info("User cleared session for article: %s", article_title)
 
     def _on_always_on_top_toggled(self, checked: bool) -> None:
         self.config.set("ui.always_on_top", checked)

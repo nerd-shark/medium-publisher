@@ -138,8 +138,8 @@ class HumanTypingSimulator:
         Returns:
             0 for no pause (90% of time), or 100-500ms pause (10% of time)
         """
-        if random.random() < 0.10:  # 10% chance of thinking pause
-            return random.randint(100, 500)
+        if random.random() < 0.05:  # 5% chance of thinking pause
+            return random.randint(100, 400)
         return 0
     
     def calculate_overhead(self, text_length: int) -> int:

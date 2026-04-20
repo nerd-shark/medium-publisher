@@ -171,7 +171,7 @@ class ConfigManager:
 
         typo_freq = self.get('typing.typo_frequency')
         if typo_freq is not None:
-            if typo_freq not in ['low', 'medium', 'high']:
+            if typo_freq not in ['none', 'low', 'medium', 'high']:
                 raise ValueError(
                     f"typing.typo_frequency must be 'low', 'medium', or 'high', got {typo_freq}"
                 )

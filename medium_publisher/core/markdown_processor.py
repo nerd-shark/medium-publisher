@@ -79,10 +79,15 @@ class MarkdownProcessor:
                 i += 1
                 continue
             
-            # Check for header
+            # Check for header (skip h1 — title comes from frontmatter)
             header_block = self._parse_header(line)
             if header_block:
                 blocks.append(header_block)
+                i += 1
+                continue
+
+            # Skip h1 headings (single #) — title is handled separately
+            if re.match(r'^#\s+', line) and not re.match(r'^##', line):
                 i += 1
                 continue
             

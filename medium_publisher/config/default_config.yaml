@@ -2,10 +2,10 @@
 
 # Typing Settings
 typing:
-  # Base typing speed in milliseconds per keystroke (~75 WPM)
-  base_delay_ms: 150
+  # Base typing speed in milliseconds per keystroke
+  base_delay_ms: 50
   # Random variation range (±30%)
-  variation_percent: 30
+  variation_percent: 20
   # Enable human-like typing simulation
   human_typing_enabled: true
   # Typo frequency: low (2%), medium (5%), high (8%), none (0%)
@@ -13,11 +13,11 @@ typing:
   # Ratio of typos corrected immediately vs deferred to review pass
   immediate_correction_ratio: 0.70
   # Thinking pause range between sentences (ms)
-  thinking_pause_min_ms: 500
-  thinking_pause_max_ms: 2000
+  thinking_pause_min_ms: 100
+  thinking_pause_max_ms: 400
   # Paragraph pause range (ms)
-  paragraph_pause_min_ms: 1000
-  paragraph_pause_max_ms: 3000
+  paragraph_pause_min_ms: 200
+  paragraph_pause_max_ms: 600
 
 # Publishing Settings
 publishing:
