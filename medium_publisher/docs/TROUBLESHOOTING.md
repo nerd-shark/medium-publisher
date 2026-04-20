@@ -1,14 +1,15 @@
-# Medium Article Publisher - Troubleshooting Guide
+# Medium Keyboard Publisher — Troubleshooting Guide
 
 ## Table of Contents
 1. [Installation Issues](#installation-issues)
-2. [Authentication Issues](#authentication-issues)
-3. [Publishing Issues](#publishing-issues)
-4. [Browser Issues](#browser-issues)
-5. [Performance Issues](#performance-issues)
-6. [Configuration Issues](#configuration-issues)
-7. [Error Messages](#error-messages)
-8. [Getting Help](#getting-help)
+2. [Screen Recognition Issues](#screen-recognition-issues)
+3. [OS-Level Input Issues](#os-level-input-issues)
+4. [Authentication Issues](#authentication-issues)
+5. [Publishing Issues](#publishing-issues)
+6. [Performance Issues](#performance-issues)
+7. [Configuration Issues](#configuration-issues)
+8. [Error Messages](#error-messages)
+9. [Getting Help](#getting-help)
 
 ## Installation Issues
 
@@ -23,8 +24,8 @@
 2. Or add manually:
    - Open System Properties → Environment Variables
    - Edit PATH variable
-   - Add Python installation directory (e.g., `C:\Python311\`)
-   - Add Scripts directory (e.g., `C:\Python311\Scripts\`)
+   - Add Python installation directory (e.g., `C:\Python312\`)
+   - Add Scripts directory (e.g., `C:\Python312\Scripts\`)
    - Restart Command Prompt
 
 **Verification**:
@@ -41,17 +42,12 @@ pip --version
 
 **Permission Error**:
 ```cmd
-REM Install to user directory
 pip install --user -r requirements.txt
 ```
 
 **Network Timeout**:
 ```cmd
-REM Increase timeout
 pip install --timeout=120 -r requirements.txt
-
-REM Use different index
-pip install --index-url https://pypi.org/simple -r requirements.txt
 ```
 
 **Corporate Proxy**:
@@ -60,25 +56,6 @@ set HTTP_PROXY=http://proxy.company.com:8080
 set HTTPS_PROXY=http://proxy.company.com:8080
 pip install -r requirements.txt
 ```
-
-### Playwright Install Fails
-
-**Symptom**: `playwright install` fails or browser doesn't launch
-
-**Solutions**:
-
-**Force Reinstall**:
-```cmd
-playwright install chromium --force
-```
-
-**Install System Dependencies**:
-```cmd
-playwright install-deps chromium
-```
-
-**Manual Browser Path**:
-If automatic installation fails, download Chromium manually and configure path in code.
 
 ### PyQt6 Import Error
 
@@ -96,103 +73,193 @@ If automatic installation fails, download Chromium manually and configure path i
    pip install PyQt6
    ```
 
-## Authentication Issues
+### pyautogui / Pillow Issues
 
-### Google OAuth Not Working
-
-**Symptom**: OAuth flow doesn't complete or times out
-
-**Solutions**:
-
-**Timeout Too Short**:
-- Default timeout is 5 minutes
-- If you need more time, increase in code:
-  ```python
-  # In auth_handler.py
-  timeout = 600  # 10 minutes
-  ```
-
-**Browser Not Opening**:
-1. Check browser visibility setting (should be visible for OAuth)
-2. Verify Playwright browser installed:
-   ```cmd
-   playwright install chromium
-   ```
-
-**Login Not Detected**:
-1. Manually complete OAuth flow in browser
-2. Wait for application to detect login (polls every 2 seconds)
-3. Check for login indicators (profile image, user menu)
-4. If still not detected, check logs for selector issues
-
-**2FA Issues**:
-- Complete 2FA in browser window
-- Application waits for completion
-- No timeout during 2FA entry
-
-### Email/Password Login Fails
-
-**Symptom**: Login fails with credentials error
-
-**Solutions**:
-
-**Incorrect Credentials**:
-1. Verify email and password are correct
-2. Try logging in manually on Medium website
-3. Reset password if needed
-
-**2FA Required**:
-1. Application will pause for 2FA entry
-2. Complete 2FA in browser window
-3. Application resumes after 2FA
-
-**Keyring Access Error**:
-- Windows Credential Manager should work automatically
-- If error occurs, credentials won't be saved (but login still works)
-- Re-enter credentials each session
-
-### Session Expired
-
-**Symptom**: "Session expired" or "Not logged in" error
-
-**Cause**: Session cookies expired (typically after 7 days)
+**Symptom**: `ImportError: No module named 'PIL'` or pyautogui fails to import
 
 **Solution**:
-1. Click "Login" button
-2. Re-authenticate with Google OAuth or email/password
-3. New session cookies will be saved
+```cmd
+pip uninstall Pillow pillow
+pip install Pillow
+pip install pyautogui
+```
 
-### Session Cookies Not Saving
+### pywin32 Issues
+
+**Symptom**: `ImportError: No module named 'win32gui'`
+
+**Solution**:
+```cmd
+pip install pywin32
+python -m pywin32_postinstall -install
+```
+
+## Screen Recognition Issues
+
+### Reference Images Not Found
+
+**Symptom**: Navigation fails — app cannot find buttons or UI elements on screen
+
+**Causes**:
+1. Display scaling differs from when reference images were captured
+2. Browser theme or zoom level changed
+3. Medium UI has been updated
+4. Reference PNG images are outdated
+
+**Solutions**:
+
+**Check Display Scaling**:
+1. Right-click Desktop → Display Settings
+2. Note your Scale setting (100%, 125%, 150%, etc.)
+3. Reference images must match your scaling
+4. If different, recapture reference images at your scale
+
+**Recapture Reference Images**:
+1. Navigate to the relevant Medium page manually
+2. Take screenshots of the UI elements the app looks for
+3. Save to `medium_publisher/assets/medium/` with the correct filename
+4. Ensure images are cropped tightly around the target element
+
+**Check Browser Zoom**:
+1. Open Chrome/Edge
+2. Press Ctrl+0 to reset zoom to 100%
+3. Reference images assume 100% browser zoom
+
+### Confidence Threshold Too High
+
+**Symptom**: `Image not found on screen` even though the element is visible
+
+**Cause**: The `confidence` parameter for `pyautogui.locateOnScreen()` is too strict
+
+**Solution**:
+1. Open Settings → Navigation
+2. Lower "Screen Confidence" from default (0.8) to 0.7 or 0.6
+3. Test again
+4. If still failing, the reference image may need recapturing
+
+### Confidence Threshold Too Low
+
+**Symptom**: App clicks wrong elements or false-matches UI components
+
+**Cause**: Confidence is too lenient, matching similar-looking elements
+
+**Solution**:
+1. Increase "Screen Confidence" to 0.85 or 0.9
+2. Recapture reference images with more unique surrounding context
+3. Ensure reference images include enough distinctive pixels
+
+### Multi-Monitor Issues
+
+**Symptom**: App clicks in wrong location or cannot find elements
+
+**Cause**: pyautogui coordinates span all monitors; reference images may be on wrong screen
+
+**Solutions**:
+1. Move the browser to your primary monitor before starting
+2. Ensure the browser is fully visible (not partially off-screen)
+3. If using different DPI per monitor, keep browser on the monitor matching reference image DPI
+
+### Dark Mode / Theme Mismatch
+
+**Symptom**: Screen recognition fails after changing browser or OS theme
+
+**Cause**: Reference images were captured in a different theme
+
+**Solution**:
+1. Use the same browser theme (light/dark) as when images were captured
+2. Or recapture all reference images in your current theme
+3. Default reference images assume Chrome with light theme
+
+## OS-Level Input Issues
+
+### Display Scaling Causes Misclicks
+
+**Symptom**: Mouse clicks land in wrong positions
+
+**Cause**: Windows display scaling not accounted for by pyautogui
+
+**Solution**:
+1. Set pyautogui DPI awareness (usually handled by the app automatically)
+2. If persists, try running at 100% display scaling
+3. Or set the app's compatibility mode: Right-click exe → Properties → Compatibility → "Override high DPI scaling" → "Application"
+
+### Typing Goes to Wrong Window
+
+**Symptom**: Characters appear in a different application instead of the browser
+
+**Cause**: Focus window detection failed or another window stole focus
+
+**Solutions**:
+1. Don't click other windows during typing
+2. Disable notification popups that steal focus
+3. Check that "Focus Detection" is enabled in Settings
+4. The app should auto-pause when focus is lost — if not, use Emergency Stop
+
+### Modifier Keys Get Stuck
+
+**Symptom**: After emergency stop or crash, Ctrl/Shift/Alt remain held down
+
+**Cause**: App was interrupted while holding modifier keys
+
+**Solution**:
+1. Press and release Ctrl, Shift, and Alt manually
+2. The app's `atexit` hook should release all keys on exit
+3. If keys remain stuck, press each modifier key once to release
+
+### Typing Speed Too Fast / Too Slow
+
+**Symptom**: Characters are dropped or typing feels unnaturally slow
+
+**Solutions**:
+1. Open Settings → Typing
+2. Adjust `base_delay_ms` (default: 150ms)
+   - Lower = faster (minimum ~50ms before characters drop)
+   - Higher = slower but more reliable
+3. Adjust `variation_percent` (default: 30%) for speed variation
+
+### Special Characters Not Typing
+
+**Symptom**: Unicode characters, emoji, or accented characters don't appear
+
+**Cause**: `pyautogui.write()` only handles ASCII reliably
+
+**Solution**:
+- The app uses `pyautogui.write()` for ASCII and falls back to clipboard paste for non-ASCII
+- If special characters still fail, check your keyboard layout matches the expected input locale
+
+## Authentication Issues
+
+### Google OAuth Not Completing
+
+**Symptom**: App opens browser but cannot complete Google login
+
+**Cause**: Screen recognition cannot find the Google sign-in buttons
+
+**Solutions**:
+1. Ensure browser is at 100% zoom (Ctrl+0)
+2. Check that reference images match your Google sign-in page layout
+3. If Google shows a different layout, check for `google-sign-in-alt.png` fallback
+4. Complete 2FA manually when prompted — the app waits for you
+
+### Login Not Detected
+
+**Symptom**: App doesn't recognize that you're already logged in
+
+**Cause**: Screen recognition cannot find the logged-in indicators
+
+**Solutions**:
+1. Ensure Medium homepage is fully loaded before starting
+2. Check that your profile avatar is visible in the top-right
+3. Try logging out and back in manually, then restart the app
+
+### Session Not Persisting
 
 **Symptom**: Must re-authenticate every launch
 
 **Solutions**:
-
-**Check Remember Login Setting**:
-1. Open Settings
-2. Verify "Remember Login" is checked
-3. Save settings
-
-**File Permission Issue**:
-```cmd
-REM Check if directory exists
-dir %USERPROFILE%\.medium_publisher
-
-REM If not, create it
-mkdir %USERPROFILE%\.medium_publisher
-
-REM Verify write permissions
-echo test > %USERPROFILE%\.medium_publisher\test.txt
-del %USERPROFILE%\.medium_publisher\test.txt
-```
-
-**Corrupted Cookie File**:
-```cmd
-REM Delete and recreate
-del %USERPROFILE%\.medium_publisher\session_cookies.json
-
-REM Re-authenticate in application
-```
+1. The app relies on browser cookies — ensure you check "Stay signed in" during login
+2. Don't clear browser cookies between sessions
+3. Check that `%USERPROFILE%\.medium_publisher\` directory exists and is writable
 
 ## Publishing Issues
 
@@ -200,215 +267,68 @@ REM Re-authenticate in application
 
 **Symptom**: Publishing starts but no content appears in editor
 
+**Causes**:
+1. Browser editor not focused
+2. Focus detection paused typing
+3. Emergency stop was triggered
+
 **Solutions**:
-
-**Selector Issue**:
-1. Medium may have changed their UI
-2. Check logs for "selector not found" errors
-3. Update `selectors.yaml` with new selectors
-4. Use browser developer tools to find correct selectors
-
-**Browser Not Focused**:
-1. Ensure browser window is visible (not headless)
-2. Don't click away from browser during typing
-3. Application needs focus to type content
-
-**Rate Limit Reached**:
-1. Check if typing is paused (waiting for rate limit window)
-2. Progress bar should show waiting status
-3. Typing will resume automatically
+1. Click inside the Medium editor before starting (or let navigation handle it)
+2. Check status bar — if it says "Focus lost", click the browser
+3. Check if Emergency Stop was triggered accidentally
 
 ### Formatting Not Applied
 
-**Symptom**: Content types but formatting (bold, italic, headers) not applied
+**Symptom**: Content types but bold/italic/headers not applied
+
+**Causes**:
+1. Keyboard shortcuts changed in Medium
+2. Timing too fast — shortcut not registered
 
 **Solutions**:
+1. Increase `base_delay_ms` to give Medium more time to process shortcuts
+2. Test keyboard shortcuts manually (Ctrl+B, Ctrl+I, Ctrl+Alt+1)
+3. Ensure Medium editor is in the correct mode (not code block mode)
 
-**Keyboard Shortcuts Changed**:
-1. Medium may have changed keyboard shortcuts
-2. Update `selectors.yaml` with new shortcuts
-3. Test shortcuts manually in Medium editor
+### Version Update Can't Find Section
 
-**Selection Issue**:
-1. Text must be selected before applying formatting
-2. Check logs for selection errors
-3. Verify selector for content area is correct
+**Symptom**: "Section not found" during version update
 
-### Placeholders Not Inserted
-
-**Symptom**: Tables or images missing, no TODO placeholders
-
-**Cause**: Markdown processor detected but didn't insert placeholder
-
-**Solution**:
-1. Check logs for table/image detection
-2. Verify markdown syntax is correct:
-   - Tables: Must have header row with `|---|---|`
-   - Images: Must use `![alt](url)` syntax
-3. Manually insert tables/images after publishing
-
-### Draft URL Not Working
-
-**Symptom**: "Invalid draft URL" error
+**Causes**:
+1. Section heading text doesn't match exactly
+2. Ctrl+F search didn't find the text in the editor
 
 **Solutions**:
-
-**URL Format**:
-Valid formats:
-- `https://medium.com/@username/article-slug-123abc`
-- `https://medium.com/p/article-id`
-- `https://medium.com/new-story`
-
-Invalid formats:
-- `http://` (must be HTTPS)
-- `medium.com` without `https://`
-- Non-Medium domains
-
-**URL Not Accessible**:
-1. Verify URL exists and is accessible
-2. Check if article is deleted or moved
-3. Try opening URL in regular browser
-
-### Version Update Fails
-
-**Symptom**: Version update doesn't find sections or apply changes
-
-**Solutions**:
-
-**Section Not Found**:
-1. Check section name in change instructions matches article
-2. Section names are case-insensitive but must match text
-3. Use exact header text (e.g., "Getting Started" not "getting started")
-
-**Change Instructions Invalid**:
-1. Verify instruction format:
-   - `Replace [section] with [content]`
-   - `Delete [section]`
-   - `Add [section]`
-2. Check logs for parsing errors
-
-**Browser Session Lost**:
-1. Version updates reuse browser session
-2. If session lost, re-authenticate
-3. Restart version update workflow
-
-## Browser Issues
-
-### Browser Won't Launch
-
-**Symptom**: Application hangs or errors when launching browser
-
-**Solutions**:
-
-**Playwright Not Installed**:
-```cmd
-playwright install chromium --force
-```
-
-**Port Conflict**:
-1. Close other browser instances
-2. Restart application
-3. Check for processes using browser ports
-
-**Antivirus Blocking**:
-1. Add Python and Playwright to antivirus exceptions
-2. Temporarily disable antivirus for testing
-3. Check antivirus logs for blocked actions
-
-### Browser Crashes
-
-**Symptom**: Browser closes unexpectedly during publishing
-
-**Solutions**:
-
-**Memory Issue**:
-1. Close other applications
-2. Increase available RAM
-3. Restart computer
-
-**Browser Update Needed**:
-```cmd
-playwright install chromium --force
-```
-
-**Corrupted Browser Profile**:
-```cmd
-REM Delete Playwright browsers
-rmdir /s /q %USERPROFILE%\AppData\Local\ms-playwright
-
-REM Reinstall
-playwright install chromium
-```
-
-### Browser Hangs
-
-**Symptom**: Browser stops responding, application waits indefinitely
-
-**Solutions**:
-
-**Increase Timeout**:
-1. Edit configuration to increase timeout
-2. Default is 30 seconds, try 60 or 120
-
-**Network Issue**:
-1. Check internet connection
-2. Verify Medium.com is accessible
-3. Check for firewall blocking
-
-**Page Load Issue**:
-1. Refresh page manually in browser
-2. Cancel and restart publishing
-3. Check Medium status page for outages
+1. Verify section names match exactly (case-sensitive)
+2. Ensure the draft is open and fully loaded before starting
+3. Try scrolling to the top (Ctrl+Home) before applying changes
 
 ## Performance Issues
 
-### Slow Typing
-
-**Symptom**: Typing is very slow, taking longer than estimated
-
-**Cause**: Rate limiting (35 chars/min hard limit)
+### Typing Speed
 
 **Expected Behavior**:
-- 1000 chars: ~30-35 minutes
-- 2000 chars: ~60-70 minutes
-- 5000 chars: ~2.5-3 hours
+Typing speed is controlled by `base_delay_ms` (default 150ms per character) with ±30% variation.
 
-**Not a Bug**: This is intentional to comply with Medium's rate limits
+**Approximate times** (at default 150ms):
+- 1000 chars: ~2.5 minutes
+- 5000 chars: ~12.5 minutes
+- 10000 chars: ~25 minutes
 
-**Solutions**:
-- Break long articles into smaller sections
-- Use version workflow to update incrementally
-- Plan publishing time accordingly
+These times increase with typo simulation overhead.
 
 ### High CPU Usage
 
-**Symptom**: Application uses high CPU during publishing
-
-**Cause**: Browser automation and typing simulation
+**Symptom**: Application uses high CPU during typing
 
 **Normal Behavior**:
-- 20-40% CPU during typing
-- 10-20% CPU during waiting
+- 5-15% CPU during active typing (pyautogui event generation)
+- <5% CPU during pauses
 
 **Solutions if Excessive**:
-1. Close other applications
-2. Use headless mode (slightly lower CPU)
-3. Reduce typing speed (less processing)
-
-### High Memory Usage
-
-**Symptom**: Application uses high memory (>1 GB)
-
-**Cause**: Browser instance and page content
-
-**Normal Behavior**:
-- 500-800 MB during publishing
-- 200-400 MB idle
-
-**Solutions if Excessive**:
-1. Restart application between batch publishes
-2. Close browser after each article
-3. Increase system RAM
+1. Increase `base_delay_ms` (reduces event frequency)
+2. Close other applications
+3. Check for runaway processes in Task Manager
 
 ## Configuration Issues
 
@@ -420,115 +340,61 @@ playwright install chromium
 
 **File Permission Issue**:
 ```cmd
-REM Check permissions
-icacls %USERPROFILE%\.medium_publisher
-
-REM Grant full control
 icacls %USERPROFILE%\.medium_publisher /grant %USERNAME%:F /T
 ```
 
 **Corrupted Config File**:
 ```cmd
-REM Delete and recreate
 del %USERPROFILE%\.medium_publisher\config.yaml
-
-REM Restart application (will recreate with defaults)
+REM Restart application (recreates with defaults)
 ```
 
 **YAML Syntax Error**:
 1. Open config file in text editor
 2. Verify YAML syntax (indentation, colons, quotes)
 3. Use online YAML validator
-4. Fix syntax errors
 
 ### Configuration Not Loading
 
-**Symptom**: Application uses defaults despite custom configuration
-
 **Solutions**:
-
-**Wrong File Location**:
-- User config: `%USERPROFILE%\.medium_publisher\config.yaml`
-- Not in application directory
-
-**Invalid Values**:
-1. Check logs for validation errors
-2. Verify value types (integer, boolean, string)
-3. Verify value ranges (e.g., speed_ms: 10-100)
-
-**File Encoding**:
-1. Save config file as UTF-8
-2. No BOM (Byte Order Mark)
-3. Use plain text editor (not Word)
+- User config location: `%USERPROFILE%\.medium_publisher\config.yaml`
+- Verify file encoding is UTF-8 (no BOM)
+- Check logs for validation errors on startup
 
 ## Error Messages
+
+### "Emergency stop is active"
+
+**Cause**: Emergency stop was triggered (hotkey, mouse corner, or UI button)
+
+**Solution**: Click "Reset" in the UI or restart the application
+
+### "Target window lost focus"
+
+**Cause**: Browser window lost focus during typing
+
+**Solution**: Click back on the browser window; typing will resume or prompt to resume
 
 ### "File not found" Error
 
 **Cause**: Selected markdown file doesn't exist or was moved
 
-**Solution**:
-1. Verify file path is correct
-2. Check file wasn't deleted or moved
-3. Re-select file using file selector
+**Solution**: Re-select the file using the file selector
 
 ### "Invalid markdown format" Error
 
 **Cause**: Markdown file has syntax errors or missing frontmatter
 
 **Solution**:
-1. Verify frontmatter is valid YAML
+1. Verify frontmatter is valid YAML (between `---` markers)
 2. Check for required fields (title)
 3. Validate markdown syntax
-4. Use markdown linter or validator
 
-### "Authentication failed" Error
+### "Image not found on screen"
 
-**Cause**: Login credentials incorrect or session expired
+**Cause**: Screen recognition failed to locate a reference image
 
-**Solution**:
-1. Verify credentials are correct
-2. Try logging in manually on Medium
-3. Reset password if needed
-4. Re-authenticate in application
-
-### "Browser error" Error
-
-**Cause**: Browser automation failed (selector not found, timeout, crash)
-
-**Solution**:
-1. Check logs for specific error
-2. Verify browser is installed: `playwright install chromium`
-3. Update selectors if Medium UI changed
-4. Restart application
-
-### "Content error" Error
-
-**Cause**: Content processing failed (invalid markdown, encoding issue)
-
-**Solution**:
-1. Check file encoding (should be UTF-8)
-2. Verify markdown syntax
-3. Check for special characters
-4. Try with simpler content first
-
-### "Rate limit exceeded" Error
-
-**Cause**: Typing too fast, exceeded 35 chars/min limit
-
-**Solution**:
-- This shouldn't happen (rate limiter prevents it)
-- If it does, it's a bug - report it
-- Workaround: Restart and continue
-
-### "Session expired" Error
-
-**Cause**: Medium session cookies expired
-
-**Solution**:
-1. Click "Login" button
-2. Re-authenticate
-3. Continue publishing
+**Solution**: See [Screen Recognition Issues](#screen-recognition-issues) above
 
 ## Getting Help
 
@@ -538,28 +404,16 @@ Logs are located in: `%USERPROFILE%\.medium_publisher\logs\`
 
 **Log Files**:
 - `medium_publisher.log`: Main application log
-- `medium_publisher_YYYYMMDD.log`: Daily log files
-
-**Log Levels**:
-- DEBUG: Detailed debugging information
-- INFO: General information
-- WARNING: Warning messages
-- ERROR: Error messages
-- CRITICAL: Critical errors
 
 **Viewing Logs**:
 ```cmd
-REM View latest log
 type %USERPROFILE%\.medium_publisher\logs\medium_publisher.log
-
-REM View specific date
-type %USERPROFILE%\.medium_publisher\logs\medium_publisher_20250301.log
 ```
 
 ### Enable Debug Logging
 
 1. Edit `medium_publisher/utils/logger.py`
-2. Change `default_level="INFO"` to `default_level="DEBUG"`
+2. Change default level to `DEBUG`
 3. Restart application
 4. Reproduce issue
 5. Check logs for detailed information
@@ -570,77 +424,21 @@ When reporting issues, include:
 
 1. **System Information**:
    - Windows version
+   - Display scaling percentage
    - Python version: `python --version`
-   - Application version
+   - Monitor configuration (single/multi, resolution)
 
 2. **Error Details**:
    - Error message (exact text)
    - Steps to reproduce
    - Expected vs actual behavior
 
-3. **Logs**:
-   - Relevant log entries
-   - Full log file if needed
+3. **Logs**: Relevant log entries
 
-4. **Configuration**:
-   - Settings used
-   - Configuration file (remove credentials)
+4. **Configuration**: Settings used (remove credentials)
 
-5. **Screenshots**:
-   - Error dialogs
-   - Browser state
-   - Application state
-
-### Common Log Patterns
-
-**Authentication Success**:
-```
-INFO: Login successful
-INFO: Session cookies saved
-```
-
-**Authentication Failure**:
-```
-ERROR: Authentication failed: Invalid credentials
-ERROR: Login attempt failed
-```
-
-**Selector Not Found**:
-```
-ERROR: Selector not found: [data-testid="storyTitle"]
-ERROR: Timeout waiting for element
-```
-
-**Rate Limit Wait**:
-```
-INFO: Rate limit reached, waiting 45 seconds
-INFO: Resuming typing
-```
-
-**Version Update**:
-```
-INFO: Applying version update: v1 -> v2
-INFO: Parsed 3 change instructions
-INFO: Section found: Introduction
-INFO: Section replaced successfully
-```
-
-### Report Issues
-
-If you can't resolve the issue:
-
-1. Check FAQ for common questions
-2. Search existing issues (if using issue tracker)
-3. Create new issue with diagnostic information
-4. Include logs, screenshots, and steps to reproduce
-
-### Community Support
-
-- Check documentation thoroughly
-- Search for similar issues
-- Ask in community forums
-- Provide detailed information when asking for help
+5. **Screenshots**: Current screen state when error occurs
 
 ---
 
-**Still Having Issues?** Check the [FAQ](FAQ.md) for more common questions and answers.
+**Last Updated**: 2025-03-01

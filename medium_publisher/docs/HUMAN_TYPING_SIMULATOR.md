@@ -2,15 +2,16 @@
 
 ## Overview
 
-The Human Typing Simulator adds realistic typing behavior including typos, corrections, variable speed, and thinking pauses to make automation indistinguishable from human typing.
+The Human Typing Simulator adds realistic typing behavior including typos, corrections, variable speed, and thinking pauses to make OS-level keyboard input indistinguishable from human typing.
 
 ## Core Features
 
 1. **Realistic Typos**: Adjacent key errors based on QWERTY layout
-2. **Delayed Corrections**: Wait 1-3 characters before fixing typos
-3. **Variable Speed**: ±20% variation in typing speed
-4. **Thinking Pauses**: Occasional 100-500ms pauses
-5. **Configurable Frequency**: Low (2%), Medium (5%), High (8%) typo rates
+2. **Immediate Corrections**: Type wrong char, continue 1-3 chars, backspace to fix (70% of typos)
+3. **Deferred Corrections**: Leave typo in place, fix during review pass (30% of typos)
+4. **Variable Speed**: Configurable ±variation applied to base delay
+5. **Thinking Pauses**: Occasional 100-500ms pauses (5% chance per character)
+6. **Configurable Frequency**: Low (2%), Medium (5%), High (8%) typo rates
 
 ## QWERTY Keyboard Layout
 
@@ -62,8 +63,8 @@ ADJACENT_KEYS = {
     '9': ['8', '0', 'i', 'o'],
     '0': ['9', '-', 'o', 'p'],
     
-    # Special characters (common typos)
-    ' ': ['b', 'n', 'm'],  # Space bar
+    # Special characters
+    ' ': ['b', 'n', 'm'],
     '.': [',', 'l'],
     ',': ['.', 'k', 'm'],
 }
@@ -103,12 +104,10 @@ class HumanTypingSimulator:
         """
         self.enabled = enabled
         self.typo_rate = {
-            "low": 0.02,     # 1 typo per 50 characters
-            "medium": 0.05,  # 1 typo per 20 characters
-            "high": 0.08     # 1 typo per 12.5 characters
+            "low": 0.02,
+            "medium": 0.05,
+            "high": 0.08
         }[typo_frequency]
-        
-        # QWERTY keyboard layout
         self.adjacent_keys = ADJACENT_KEYS
 ```
 
@@ -116,35 +115,19 @@ class HumanTypingSimulator:
 
 ```python
 def should_make_typo(self) -> bool:
-    """Determine if next character should be a typo.
-    
-    Returns:
-        True if should make typo
-    """
+    """Determine if next character should be a typo."""
     if not self.enabled:
         return False
-    
     return random.random() < self.typo_rate
 
 def generate_typo(self, intended_char: str) -> str:
-    """Generate realistic typo for character.
-    
-    Args:
-        intended_char: The character user intended to type
-    
-    Returns:
-        Adjacent key character (typo)
-    """
+    """Generate realistic typo using adjacent QWERTY key."""
     char_lower = intended_char.lower()
-    
-    # Get adjacent keys
     adjacent = self.adjacent_keys.get(char_lower, [])
     
     if not adjacent:
-        # No adjacent keys defined, return same character
         return intended_char
     
-    # Select random adjacent key
     typo_char = random.choice(adjacent)
     
     # Preserve case
@@ -154,27 +137,6 @@ def generate_typo(self, intended_char: str) -> str:
     return typo_char
 ```
 
-### Correction Timing
-
-```python
-def get_correction_delay(self) -> int:
-    """Get delay before correcting typo.
-    
-    Simulates human noticing typo after typing 1-3 more characters.
-    
-    Returns:
-        Delay in milliseconds
-    """
-    # Type 1-3 more characters before noticing
-    extra_chars = random.randint(1, 3)
-    
-    # Each character takes base_delay ms
-    # Use average of 40ms per character
-    delay = extra_chars * 40
-    
-    return delay
-```
-
 ### Speed Variation
 
 ```python
@@ -182,117 +144,123 @@ def get_typing_delay(self, base_delay: int) -> int:
     """Add random variation to typing delay.
     
     Args:
-        base_delay: Base delay in milliseconds
+        base_delay: Base delay in milliseconds (from config)
     
     Returns:
-        Varied delay (±20%)
+        Varied delay (±variation_percent)
     """
-    # Add ±20% variation
     variation = random.uniform(-0.2, 0.2)
-    varied_delay = base_delay * (1 + variation)
-    
-    return int(varied_delay)
+    return int(base_delay * (1 + variation))
 ```
 
 ### Thinking Pauses
 
 ```python
 def get_thinking_pause(self) -> int:
-    """Occasionally return longer pause.
-    
-    Simulates human pausing to think about next sentence.
+    """Occasionally return longer pause (5% chance).
     
     Returns:
         Pause duration (100-500ms) or 0
     """
-    # 5% chance of thinking pause
     if random.random() < 0.05:
         return random.randint(100, 500)
-    
     return 0
 ```
 
-### Overhead Calculation
+### Correction Delay
 
 ```python
-def calculate_overhead(self, text_length: int) -> int:
-    """Calculate extra time needed for typos and corrections.
-    
-    Args:
-        text_length: Length of text to type
+def get_correction_delay(self) -> int:
+    """Get number of extra characters typed before noticing typo.
     
     Returns:
-        Extra seconds needed
+        Number of extra characters (1-3)
     """
-    if not self.enabled:
-        return 0
-    
-    # Calculate expected typos
-    num_typos = int(text_length * self.typo_rate)
-    
-    # Each typo adds:
-    # 1. Wrong character (1 keystroke)
-    # 2. 1-3 more characters (avg 2 keystrokes)
-    # 3. Backspace to delete (avg 3 keystrokes for 3 chars)
-    # 4. Correct character (1 keystroke)
-    # Total: ~7 extra keystrokes per typo
-    
-    extra_keystrokes = num_typos * 7
-    
-    # Assume 40ms per keystroke
-    extra_ms = extra_keystrokes * 40
-    
-    # Convert to seconds
-    extra_seconds = extra_ms / 1000
-    
-    return int(extra_seconds)
+    return random.randint(1, 3)
 ```
+
+## Integration with ContentTyper
+
+The `ContentTyper` uses `HumanTypingSimulator` and `OS_Input_Controller` together:
+
+```python
+class ContentTyper:
+    def __init__(self, input_controller, typing_simulator, typo_tracker, config):
+        self._input = input_controller          # OS_Input_Controller (pyautogui)
+        self._simulator = typing_simulator       # HumanTypingSimulator
+        self._tracker = typo_tracker            # DeferredTypoTracker
+        self._base_delay_ms = config.get("typing.base_delay_ms", 150)
+        self._immediate_ratio = config.get("typing.immediate_correction_ratio", 0.70)
+
+    def _type_with_typos(self, text: str, allow_typos: bool = True):
+        for char in text:
+            # Typing delay with variation
+            delay_ms = self._simulator.get_typing_delay(self._base_delay_ms)
+            time.sleep(delay_ms / 1000.0)
+            
+            # Thinking pause
+            pause = self._simulator.get_thinking_pause()
+            if pause > 0:
+                time.sleep(pause / 1000.0)
+            
+            if allow_typos and self._simulator.should_make_typo():
+                typo_char = self._simulator.generate_typo(char)
+                
+                if random.random() < self._immediate_ratio:
+                    # Immediate correction via OS_Input_Controller
+                    self._input.type_character(typo_char)
+                    # Type 1-3 more chars, then backspace and retype
+                    # ... (correction logic)
+                else:
+                    # Deferred: type wrong char, record for review pass
+                    self._input.type_character(typo_char)
+                    self._tracker.record(...)
+            else:
+                # Type correct character via OS-level input
+                self._input.type_character(char)
+```
+
+Key points:
+- All typing goes through `OS_Input_Controller.type_character()` which calls `pyautogui.write()`
+- Every keystroke checks emergency stop and focus detection before executing
+- No browser page object or Playwright — pure OS-level keyboard events
+- `time.sleep()` for all delays (synchronous, runs in QThread)
 
 ## Typo Simulation Flow
 
-### Example: Typing "hello"
+### Example: Typing "hello" with immediate correction
 
 ```
 Intended: h e l l o
-          ↓ ↓ ↓ ↓ ↓
-Check:    N N Y N N  (Y = make typo)
-          ↓ ↓ ↓ ↓ ↓
-Typed:    h e k l o  (k is adjacent to l)
-                ↑
-                typo!
+Check:    N N Y N N  (Y = make typo at position 2)
+Typed:    h e k l    (k is adjacent to l, then 1 extra char typed)
 
 Correction Flow:
-1. Type 'h' (correct)
-2. Type 'e' (correct)
-3. Type 'k' (typo for 'l')
-4. Type 'l' (continue, haven't noticed yet)
-5. Type 'o' (continue, haven't noticed yet)
-6. Wait 80ms (correction delay for 2 chars)
-7. Press Backspace 3 times (delete 'klo')
-8. Type 'l' (correct)
-9. Type 'l' (correct)
-10. Type 'o' (correct)
+1. Type 'h' via pyautogui (correct)
+2. Type 'e' via pyautogui (correct)
+3. Type 'k' via pyautogui (typo for 'l')
+4. Type 'l' via pyautogui (1 extra char before noticing)
+5. Press Backspace twice (delete 'kl')
+6. Type 'l' via pyautogui (correct)
+7. Type 'l' via pyautogui (correct)
+8. Type 'o' via pyautogui (correct)
 
 Final result: hello
 ```
 
-### Detailed Timeline
+### Deferred Typo Example
 
 ```
-Time (ms)  Action              Display
----------  -----------------   -------
-0          Type 'h'            h
-40         Type 'e'            he
-80         Type 'k' (typo!)    hek
-120        Type 'l'            hekl
-160        Type 'o'            heklo
-240        [Notice typo]       heklo
-241        Backspace           hekl
-242        Backspace           hek
-243        Backspace           he
-283        Type 'l'            hel
-323        Type 'l'            hell
-363        Type 'o'            hello
+Intended: h e l l o
+Check:    N N Y N N  (Y = deferred typo)
+Typed:    h e k l o  (typo stays — recorded in tracker)
+
+Later in review pass:
+1. Ctrl+Home (go to top)
+2. Ctrl+F → type surrounding context to find "heklo"
+3. Escape (close find)
+4. Backspace (delete 'k')
+5. Type 'l' (correct character)
 ```
 
 ## Configuration
@@ -303,6 +271,9 @@ Time (ms)  Action              Display
 typing:
   human_typing_enabled: true
   typo_frequency: "low"  # low, medium, high
+  base_delay_ms: 150
+  variation_percent: 30
+  immediate_correction_ratio: 0.70  # 70% immediate, 30% deferred
 ```
 
 | Setting | Rate | Typos per 100 chars | Description |
@@ -316,59 +287,29 @@ typing:
 Typos are **never** simulated for:
 1. **Code blocks**: Preserve exact syntax
 2. **URLs**: Prevent broken links
-3. **TODO placeholders**: Keep markers intact
-4. **Special characters**: Avoid formatting issues
-
-```python
-async def type_text(self, text: str, allow_typos: bool = True):
-    """Type text with optional typo simulation.
-    
-    Args:
-        text: Text to type
-        allow_typos: Whether to allow typos (False for code/URLs)
-    """
-    for char in text:
-        if allow_typos and self.human_simulator.should_make_typo():
-            # Simulate typo
-            pass
-        else:
-            # Type correctly
-            pass
-```
+3. **Placeholder text**: Keep markers intact
+4. **Formatting markers**: Backticks, list prefixes
+5. **Ctrl+F search text**: Must match exactly
 
 ## Performance Impact
 
 ### Time Overhead
 
-**Low typos (2%)**:
+**Low typos (2%)** at 150ms base delay:
 - 1000 chars → ~20 typos
-- Extra keystrokes: 20 * 7 = 140
-- Extra time: 140 * 40ms = 5.6 seconds
-- Overhead: ~5.6%
+- Immediate (14): 14 × 7 extra keystrokes × 150ms = ~15s
+- Deferred (6): 6 × review pass time (~3s each) = ~18s
+- Total overhead: ~33s on a ~150s base = ~22%
 
 **Medium typos (5%)**:
 - 1000 chars → ~50 typos
-- Extra keystrokes: 50 * 7 = 350
-- Extra time: 350 * 40ms = 14 seconds
-- Overhead: ~14%
-
-**High typos (8%)**:
-- 1000 chars → ~80 typos
-- Extra keystrokes: 80 * 7 = 560
-- Extra time: 560 * 40ms = 22.4 seconds
-- Overhead: ~22.4%
+- Overhead: ~80s on a ~150s base = ~53%
 
 ### Memory Usage
 
-- O(1) constant memory
-- QWERTY map: ~2KB
-- No dynamic allocation during typing
-
-### CPU Usage
-
-- Minimal: Random number generation only
-- No complex calculations
-- Negligible impact on performance
+- O(1) constant memory for simulator
+- O(n) for deferred typo tracker (n = number of deferred typos)
+- QWERTY map: ~2KB static
 
 ## Testing
 
@@ -379,56 +320,37 @@ def test_typo_generation():
     """Test typo generation uses adjacent keys."""
     simulator = HumanTypingSimulator(typo_frequency="high", enabled=True)
     
-    # Test multiple times to ensure randomness
     typos = set()
     for _ in range(100):
         typo = simulator.generate_typo('e')
         typos.add(typo)
     
-    # Should only generate adjacent keys
-    expected = {'w', 'r', 'd', 's'}
+    expected = {'w', 'r', 'd', 's', '3', '4'}
     assert typos.issubset(expected)
 
 def test_typo_frequency():
     """Test typo frequency matches configuration."""
     simulator = HumanTypingSimulator(typo_frequency="medium", enabled=True)
     
-    # Simulate 1000 characters
-    typo_count = 0
-    for _ in range(1000):
-        if simulator.should_make_typo():
-            typo_count += 1
+    typo_count = sum(1 for _ in range(1000) if simulator.should_make_typo())
     
-    # Should be approximately 5% (50 typos)
-    # Allow ±20% variance for randomness
+    # Should be approximately 5% (50 typos), allow ±20% variance
     assert 40 <= typo_count <= 60
-
-def test_correction_delay():
-    """Test correction delay is reasonable."""
-    simulator = HumanTypingSimulator()
-    
-    # Test multiple times
-    delays = [simulator.get_correction_delay() for _ in range(100)]
-    
-    # Should be between 40ms (1 char) and 120ms (3 chars)
-    assert all(40 <= d <= 120 for d in delays)
 
 def test_typing_variation():
     """Test typing speed variation."""
     simulator = HumanTypingSimulator()
-    base_delay = 50
+    base_delay = 150
     
-    # Test multiple times
     delays = [simulator.get_typing_delay(base_delay) for _ in range(100)]
     
-    # Should vary ±20%
-    assert all(40 <= d <= 60 for d in delays)
+    # Should vary within ±20% of base
+    assert all(120 <= d <= 180 for d in delays)
 
 def test_thinking_pauses():
     """Test thinking pauses occur occasionally."""
     simulator = HumanTypingSimulator()
     
-    # Test 1000 times
     pause_count = 0
     for _ in range(1000):
         pause = simulator.get_thinking_pause()
@@ -436,100 +358,18 @@ def test_thinking_pauses():
             pause_count += 1
             assert 100 <= pause <= 500
     
-    # Should occur ~5% of time (50 times)
-    # Allow ±30% variance
+    # Should occur ~5% of time
     assert 35 <= pause_count <= 65
 ```
-
-### Integration Tests
-
-```python
-async def test_realistic_typing():
-    """Test complete typing with human simulation."""
-    simulator = HumanTypingSimulator(typo_frequency="medium", enabled=True)
-    text = "The quick brown fox jumps over the lazy dog"
-    
-    typed_chars = []
-    corrections = []
-    
-    for char in text:
-        if simulator.should_make_typo():
-            # Type typo
-            typo = simulator.generate_typo(char)
-            typed_chars.append(typo)
-            
-            # Wait before correcting
-            delay = simulator.get_correction_delay()
-            await asyncio.sleep(delay / 1000)
-            
-            # Backspace
-            typed_chars.pop()
-            corrections.append(char)
-        
-        # Type correct character
-        typed_chars.append(char)
-        
-        # Typing delay
-        delay = simulator.get_typing_delay(40)
-        await asyncio.sleep(delay / 1000)
-    
-    # Final text should be correct
-    assert ''.join(typed_chars) == text
-    
-    # Should have some corrections
-    assert len(corrections) > 0
-```
-
-## Troubleshooting
-
-### Issue: Too many typos
-
-**Symptom**: Typing seems unrealistic with excessive errors
-
-**Solution**: Lower typo frequency to "low" (2%)
-
-### Issue: Not enough variation
-
-**Symptom**: Typing seems robotic despite human simulation
-
-**Solutions**:
-1. Increase base typing delay variation
-2. Increase thinking pause frequency
-3. Add more randomness to correction timing
-
-### Issue: Typos in code blocks
-
-**Symptom**: Code blocks have syntax errors
-
-**Solution**: Ensure `allow_typos=False` for code blocks
-
-### Issue: Performance degradation
-
-**Symptom**: Typing becomes slower over time
-
-**Solutions**:
-1. Check for memory leaks in typo tracking
-2. Verify random number generator not blocking
-3. Profile code to identify bottlenecks
 
 ## Best Practices
 
 1. **Use Low Frequency**: Start with "low" (2%) for most articles
-2. **Disable for Code**: Never simulate typos in code blocks
+2. **Disable for Code-Heavy Articles**: If article is mostly code, disable typos entirely
 3. **Test First**: Test with short text before long articles
-4. **Monitor Logs**: Check logs for typo patterns
-5. **Adjust as Needed**: Tune frequency based on results
-
-## Future Enhancements
-
-1. **Learning Mode**: Adapt typo patterns based on user's actual typing
-2. **Fatigue Simulation**: Increase typo rate over time
-3. **Context-Aware**: Different rates for different content types
-4. **Personalization**: User-specific typo patterns
-5. **Advanced Patterns**: Simulate common typing mistakes (double letters, transpositions)
+4. **Monitor Review Pass**: Watch the deferred correction pass to verify it works
+5. **Adjust Timing**: If corrections look unnatural, adjust `immediate_correction_ratio`
 
 ---
 
-**Document Version**: 1.0
 **Last Updated**: 2025-03-01
-**Maintained By**: Development Team

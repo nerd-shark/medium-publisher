@@ -2,13 +2,17 @@
 
 ## Version History
 - **v1** (2026-04-16): Brainstorming outline with exploratory thinking
+- **v2** (2026-04-20): Detailed outline with rough prose, added bracketed thinking notes
+- **v3** (2026-04-20): First full prose version, integrated all thinking notes
+- **v4** (2026-04-20): First publishable version, added "What They'd Do Differently" section, polished series finale conclusion
 
 ## Content Status
-- [ ] v1 outline complete
-- [ ] v2 detailed outline
-- [ ] v3 full prose
-- [ ] v4 publishable
-- [ ] Advertising materials created
+- [x] v1 outline complete
+- [x] v2 detailed outline
+- [x] v3 full prose
+- [x] v4 publishable
+- [x] Advertising materials created
+- [ ] Published to Medium
 
 ## Target Publication Date
 April 29, 2026 (Wednesday)

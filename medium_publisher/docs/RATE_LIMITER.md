@@ -1,341 +1,178 @@
-# Rate Limiter Implementation
+# Typing Speed Control
 
 ## Overview
 
-The Rate Limiter enforces a maximum typing speed of 35 characters per minute to comply with Medium's rate limits and simulate realistic human typing behavior.
+The Medium Keyboard Publisher controls typing speed through configurable delays between keystrokes. There is no external rate limiter or sliding window algorithm — speed is governed by `base_delay_ms` and `variation_percent` in the configuration.
 
-## Algorithm: Sliding Window
+## How Typing Speed Works
 
-### Concept
+### Configuration Parameters
 
-The sliding window algorithm tracks characters typed within a rolling time window (1 minute). When the limit is reached, the system waits until enough time has passed for the window to "slide" forward.
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `base_delay_ms` | 150 | Milliseconds between each keystroke |
+| `variation_percent` | 30 | Random ±% variation applied to base delay |
 
-### Implementation
+### Effective Speed
+
+With default settings (150ms base, 30% variation):
+- **Minimum delay**: 150 × 0.70 = 105ms per character
+- **Maximum delay**: 150 × 1.30 = 195ms per character
+- **Average**: ~150ms per character → ~6.7 characters/second → ~400 chars/minute
+
+### Speed Calculation
+
+The `HumanTypingSimulator.get_typing_delay()` method applies variation:
 
 ```python
-class RateLimiter:
-    def __init__(self, max_chars_per_minute: int = 35):
-        self.max_chars_per_minute = max_chars_per_minute
-        self.chars_typed = 0
-        self.window_start = None
-        
-    async def wait_if_needed(self, chars_to_type: int):
-        """Wait if typing would exceed rate limit."""
-        current_time = time.time()
-        
-        # Initialize window on first call
-        if self.window_start is None:
-            self.window_start = current_time
-            self.chars_typed = 0
-        
-        # Calculate elapsed time in current window
-        elapsed = current_time - self.window_start
-        
-        # If window expired (>60 seconds), reset
-        if elapsed >= 60:
-            self.window_start = current_time
-            self.chars_typed = 0
-            elapsed = 0
-        
-        # Check if adding chars would exceed limit
-        if self.chars_typed + chars_to_type > self.max_chars_per_minute:
-            # Calculate wait time
-            time_to_wait = 60 - elapsed
-            
-            if time_to_wait > 0:
-                await asyncio.sleep(time_to_wait)
-            
-            # Reset window after waiting
-            self.window_start = time.time()
-            self.chars_typed = 0
-        
-        # Add chars to counter
-        self.chars_typed += chars_to_type
+def get_typing_delay(self, base_delay: int) -> int:
+    """Add random variation to typing delay.
+    
+    Args:
+        base_delay: Base delay in milliseconds (from config)
+    
+    Returns:
+        Varied delay in milliseconds
+    """
+    variation = random.uniform(
+        -self.variation_percent / 100,
+        self.variation_percent / 100
+    )
+    return int(base_delay * (1 + variation))
 ```
-
-## Visual Example
-
-```
-Time:     0s    10s    20s    30s    40s    50s    60s    70s
-          |------|------|------|------|------|------|------|
-Chars:    10     15     20     25     30     35     [WAIT]  5
-Window:   [-------------- 60 seconds --------------]
-                                                    [---- new window ----]
-```
-
-### Explanation
-
-1. **Window Start**: Track when current window started
-2. **Character Counter**: Count chars typed in current window
-3. **Limit Check**: Before typing, check if would exceed 35 chars
-4. **Wait Calculation**: If exceeding, wait until window expires
-5. **Window Reset**: After waiting, reset counter and start new window
 
 ## Time Estimation
 
 ### Formula
 
 ```python
-def get_estimated_time(self, total_chars: int, typo_rate: float = 0.0) -> int:
-    """Calculate estimated typing time in seconds.
+def estimate_typing_time(total_chars: int, base_delay_ms: int, typo_rate: float) -> int:
+    """Estimate total typing time in seconds.
     
     Args:
-        total_chars: Total characters to type
-        typo_rate: Typo rate (0.0-1.0)
+        total_chars: Number of characters to type
+        base_delay_ms: Base delay between keystrokes (ms)
+        typo_rate: Typo frequency (0.0-0.08)
     
     Returns:
         Estimated time in seconds
     """
-    # Calculate typos
+    # Base typing time
+    base_time_ms = total_chars * base_delay_ms
+    
+    # Typo overhead: each typo adds ~7 extra keystrokes
     num_typos = int(total_chars * typo_rate)
+    typo_overhead_ms = num_typos * 7 * base_delay_ms
     
-    # Each typo adds ~4 keystrokes:
-    # 1. Wrong character
-    # 2-3. Additional characters before noticing
-    # 4. Backspace to delete
-    # 5. Correct character
-    correction_overhead = num_typos * 4
+    # Thinking pauses: ~5% of characters trigger a 100-500ms pause
+    pause_chars = int(total_chars * 0.05)
+    avg_pause_ms = 300  # average of 100-500ms
+    pause_overhead_ms = pause_chars * avg_pause_ms
     
-    # Total characters including corrections
-    total_with_corrections = total_chars + correction_overhead
-    
-    # Time = characters / rate
-    # Rate is chars per minute, so multiply by 60 for seconds
-    time_seconds = (total_with_corrections / self.max_chars_per_minute) * 60
-    
-    return int(time_seconds)
+    total_ms = base_time_ms + typo_overhead_ms + pause_overhead_ms
+    return int(total_ms / 1000)
 ```
 
 ### Example Calculations
 
-**Example 1: 1000 characters, no typos**
+**1000 characters, default settings (150ms), low typos (2%)**:
 ```
-total_chars = 1000
-typo_rate = 0.0
-corrections = 0
-total_with_corrections = 1000
-time = (1000 / 35) * 60 = 1714 seconds = 28.6 minutes
-```
-
-**Example 2: 1000 characters, low typos (2%)**
-```
-total_chars = 1000
-typo_rate = 0.02
-num_typos = 1000 * 0.02 = 20 typos
-corrections = 20 * 4 = 80 characters
-total_with_corrections = 1000 + 80 = 1080
-time = (1080 / 35) * 60 = 1851 seconds = 30.9 minutes
+Base time:      1000 × 150ms = 150,000ms = 150s
+Typo overhead:  20 typos × 7 × 150ms = 21,000ms = 21s
+Thinking:       50 pauses × 300ms = 15,000ms = 15s
+Total:          ~186 seconds ≈ 3.1 minutes
 ```
 
-**Example 3: 1000 characters, medium typos (5%)**
+**5000 characters, default settings, medium typos (5%)**:
 ```
-total_chars = 1000
-typo_rate = 0.05
-num_typos = 1000 * 0.05 = 50 typos
-corrections = 50 * 4 = 200 characters
-total_with_corrections = 1000 + 200 = 1200
-time = (1200 / 35) * 60 = 2057 seconds = 34.3 minutes
+Base time:      5000 × 150ms = 750,000ms = 750s
+Typo overhead:  250 typos × 7 × 150ms = 262,500ms = 262s
+Thinking:       250 pauses × 300ms = 75,000ms = 75s
+Total:          ~1087 seconds ≈ 18.1 minutes
 ```
 
-**Example 4: 1000 characters, high typos (8%)**
+**1000 characters, fast settings (80ms), no typos**:
 ```
-total_chars = 1000
-typo_rate = 0.08
-num_typos = 1000 * 0.08 = 80 typos
-corrections = 80 * 4 = 320 characters
-total_with_corrections = 1000 + 320 = 1320
-time = (1320 / 35) * 60 = 2263 seconds = 37.7 minutes
+Base time:      1000 × 80ms = 80,000ms = 80s
+Typo overhead:  0
+Thinking:       50 pauses × 300ms = 15,000ms = 15s
+Total:          ~95 seconds ≈ 1.6 minutes
 ```
 
 ## Integration with ContentTyper
 
+The `ContentTyper` class uses the typing delay on every character:
+
 ```python
 class ContentTyper:
-    def __init__(self, page, config: dict):
-        self.page = page
-        self.rate_limiter = RateLimiter(max_chars_per_minute=35)
-        self.human_simulator = HumanTypingSimulator(
-            typo_frequency=config.get("typo_frequency", "low"),
-            enabled=config.get("human_typing_enabled", True)
-        )
-        self.base_delay = config.get("typing_speed_ms", 30)
-    
-    async def type_text(self, text: str):
-        """Type text with rate limiting and human simulation."""
+    def __init__(self, input_controller, typing_simulator, typo_tracker, config):
+        self._base_delay_ms = config.get("typing.base_delay_ms", 150)
+        # ...
+
+    def _type_with_typos(self, text: str, allow_typos: bool = True):
         for char in text:
-            # Wait for rate limiter
-            await self.rate_limiter.wait_if_needed(1)
+            # Get varied delay from simulator
+            delay_ms = self._simulator.get_typing_delay(self._base_delay_ms)
+            time.sleep(delay_ms / 1000.0)
             
-            # Check if should make typo
-            if self.human_simulator.should_make_typo():
-                # Type wrong character
-                typo_char = self.human_simulator.generate_typo(char)
-                await self.page.keyboard.type(typo_char)
-                
-                # Type 1-3 more characters
-                correction_delay = self.human_simulator.get_correction_delay()
-                await asyncio.sleep(correction_delay / 1000)
-                
-                # Backspace to delete typo
-                await self.page.keyboard.press("Backspace")
-            
-            # Type correct character
-            await self.page.keyboard.type(char)
-            
-            # Add typing delay with variation
-            delay = self.human_simulator.get_typing_delay(self.base_delay)
-            await asyncio.sleep(delay / 1000)
-            
-            # Occasional thinking pause
-            pause = self.human_simulator.get_thinking_pause()
+            # Optional thinking pause
+            pause = self._simulator.get_thinking_pause()
             if pause > 0:
-                await asyncio.sleep(pause / 1000)
+                time.sleep(pause / 1000.0)
+            
+            # Type the character via OS-level input
+            self._input.type_character(char)
 ```
 
-## Performance Characteristics
+## Configuring Speed
 
-### Time Complexity
-- `wait_if_needed()`: O(1) - constant time operations
-- `reset_window()`: O(1) - simple assignment
-- `get_estimated_time()`: O(1) - arithmetic operations
+### In Settings Dialog
 
-### Space Complexity
-- O(1) - fixed memory usage (3 variables)
+1. Open Settings → Typing
+2. Adjust "Base Delay (ms)" slider or input
+3. Adjust "Variation (%)" for randomness
+4. Save
 
-### Accuracy
-- Window timing: ±100ms (asyncio.sleep precision)
-- Character counting: Exact
-- Time estimation: ±5% (depends on actual typing variation)
-
-## Configuration
-
-### Default Configuration
+### In config.yaml
 
 ```yaml
 typing:
-  max_chars_per_minute: 35  # HARD LIMIT - not user configurable
-  speed_ms: 30              # Base delay between characters
-  paragraph_delay_ms: 100   # Delay between paragraphs
+  base_delay_ms: 150        # Milliseconds between keystrokes
+  variation_percent: 30      # ±30% random variation
+  human_typing_enabled: true # Enable typo simulation
+  typo_frequency: "low"     # low (2%), medium (5%), high (8%)
 ```
 
-### Why 35 Characters Per Minute?
+### Speed Presets
 
-1. **Medium Rate Limits**: Prevents triggering Medium's anti-bot detection
-2. **Human-Like**: Realistic typing speed for careful content entry
-3. **Safety Margin**: Leaves buffer for network delays and processing
-4. **Tested**: Empirically determined to work reliably
+| Preset | base_delay_ms | Effective Speed | Use Case |
+|--------|--------------|-----------------|----------|
+| Fast | 50-80 | ~12-20 chars/sec | Testing, short articles |
+| Normal | 120-180 | ~5-8 chars/sec | Standard publishing |
+| Careful | 200-300 | ~3-5 chars/sec | Maximum realism |
 
-## Testing
+## Why No Hard Rate Limit?
 
-### Unit Tests
+The application uses OS-level keyboard input (pyautogui) to type into the browser. Since this produces real keystrokes indistinguishable from human typing, there is no need for an artificial rate limit. The typing speed is controlled purely by the delay between keystrokes, which the user can configure to their preference.
 
-```python
-def test_rate_limiter_enforces_limit():
-    """Test rate limiter enforces character limit."""
-    limiter = RateLimiter(max_chars_per_minute=35)
-    
-    # Type 35 characters quickly
-    start_time = time.time()
-    for i in range(35):
-        await limiter.wait_if_needed(1)
-    elapsed = time.time() - start_time
-    
-    # Should complete quickly (within window)
-    assert elapsed < 5
-    
-    # Try to type 36th character
-    start_time = time.time()
-    await limiter.wait_if_needed(1)
-    elapsed = time.time() - start_time
-    
-    # Should wait until window expires
-    assert elapsed >= 55  # ~60 seconds minus processing time
+## Additional Timing Factors
 
-def test_rate_limiter_resets_window():
-    """Test rate limiter resets after window expires."""
-    limiter = RateLimiter(max_chars_per_minute=35)
-    
-    # Type 35 characters
-    for i in range(35):
-        await limiter.wait_if_needed(1)
-    
-    # Wait for window to expire
-    await asyncio.sleep(61)
-    
-    # Should be able to type again without waiting
-    start_time = time.time()
-    await limiter.wait_if_needed(1)
-    elapsed = time.time() - start_time
-    
-    assert elapsed < 1
+Beyond the base delay, these factors affect total typing time:
 
-def test_estimated_time_calculation():
-    """Test time estimation accuracy."""
-    limiter = RateLimiter(max_chars_per_minute=35)
-    
-    # 1000 chars, no typos
-    time_no_typos = limiter.get_estimated_time(1000, 0.0)
-    assert time_no_typos == 1714  # (1000/35)*60
-    
-    # 1000 chars, 5% typos
-    time_with_typos = limiter.get_estimated_time(1000, 0.05)
-    assert time_with_typos == 2057  # (1200/35)*60
-```
+1. **Thinking pauses**: 5% chance of 100-500ms pause per character
+2. **Typo correction**: Each typo adds ~7 extra keystrokes at base delay
+3. **Formatting shortcuts**: Brief delays for Ctrl+B, Ctrl+I, etc.
+4. **Paragraph breaks**: Small delay between content blocks
+5. **Review pass**: Deferred typo corrections at end (Ctrl+F → fix each)
 
-## Troubleshooting
+## Monitoring Progress
 
-### Issue: Typing too slow
-
-**Symptom**: Articles take much longer than estimated
-
-**Causes**:
-1. Network latency adding delays
-2. Browser performance issues
-3. System resource constraints
-
-**Solutions**:
-1. Check network connection
-2. Close other applications
-3. Use headless mode for better performance
-
-### Issue: Rate limit errors from Medium
-
-**Symptom**: Medium displays "Too many requests" error
-
-**Causes**:
-1. Rate limiter not working correctly
-2. Multiple instances running
-3. Other automation running simultaneously
-
-**Solutions**:
-1. Verify rate limiter is enabled
-2. Close other instances
-3. Wait 5-10 minutes before retrying
-
-### Issue: Inaccurate time estimates
-
-**Symptom**: Actual time differs significantly from estimate
-
-**Causes**:
-1. Typo rate higher/lower than configured
-2. Network delays not accounted for
-3. Browser rendering delays
-
-**Solutions**:
-1. Adjust typo frequency setting
-2. Add 10-15% buffer to estimates
-3. Test with sample article to calibrate
-
-## Best Practices
-
-1. **Don't Disable**: Rate limiter is critical for avoiding bans
-2. **Monitor Logs**: Check logs for rate limit warnings
-3. **Test First**: Test with short articles before long ones
-4. **Be Patient**: Accept that typing takes time
-5. **Plan Ahead**: Schedule publishing during low-activity times
+The UI displays:
+- **Elapsed time**: How long typing has been running
+- **Estimated remaining**: Based on characters left × average delay
+- **Block progress**: "Block N of M" counter
+- **Characters typed**: Running count
 
 ---
 
-**Document Version**: 1.0
 **Last Updated**: 2025-03-01
-**Maintained By**: Development Team

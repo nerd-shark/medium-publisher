@@ -30,6 +30,7 @@ resiliency
 6. https://medium.com/gitconnected/rate-limiting-and-backpressure-protecting-systems-from-themselves-72a3f9162ea8
 7. https://medium.com/@the-architect-ds/the-bulkhead-pattern-isolating-failure-domains-within-services-f0d6f5a5341e
 8. https://medium.com/gitconnected/incident-response-from-detection-to-resolution-in-10-minutes-ad96ba015264
+9. https://medium.com/gitconnected/cross-functional-communication-engineering-product-and-design-379a9a1df63e
 
 agentic-ai
 
@@ -39,6 +40,7 @@ agentic-ai
 4. https://medium.com/@the-architect-ds/building-your-first-agentic-ai-system-a-practical-guide-eab2a281de62
 5. https://medium.com/@the-architect-ds/the-promise-work-pattern-kubernetes-style-orchestration-for-ai-agents-de0945951dae
 6. https://medium.com/@the-architect-ds/memory-systems-for-ai-agents-beyond-context-windows-967b39ce9896
+7. https://medium.com/@the-architect-ds/agentic-ai-roi-the-real-numbers-behind-the-79-adoption-rate-9f729f51c036
 
 quantum computing
 

@@ -1,6 +1,6 @@
 # Packaging and Distribution Guide
 
-This guide explains how to package and distribute the Medium Article Publisher application for Windows.
+This guide explains how to package and distribute the Medium Keyboard Publisher for Windows.
 
 ## Table of Contents
 
@@ -8,9 +8,8 @@ This guide explains how to package and distribute the Medium Article Publisher a
 2. [Building the Executable](#building-the-executable)
 3. [Testing the Executable](#testing-the-executable)
 4. [Creating the Installer](#creating-the-installer)
-5. [Creating Desktop Shortcuts](#creating-desktop-shortcuts)
-6. [Distribution](#distribution)
-7. [Troubleshooting](#troubleshooting)
+5. [Distribution](#distribution)
+6. [Troubleshooting](#troubleshooting)
 
 ## Prerequisites
 
@@ -24,54 +23,40 @@ This guide explains how to package and distribute the Medium Article Publisher a
    - Installed automatically by build script
    - Manual install: `pip install pyinstaller`
 
-3. **Inno Setup 6.x** (Optional - for installer)
+3. **Inno Setup 6.x** (Optional — for installer)
    - Download from: https://jrsoftware.org/isinfo.php
-   - Required only if creating an installer
+   - Required only if creating a Windows installer
 
 ### Project Setup
 
 1. Clone the repository
-2. Create virtual environment:
+2. From the workspace root (folder containing `medium_publisher/`):
    ```cmd
    python -m venv venv
-   ```
-
-3. Activate virtual environment:
-   ```cmd
    venv\Scripts\activate
-   ```
-
-4. Install dependencies:
-   ```cmd
-   pip install -r requirements.txt
-   ```
-
-5. Install Playwright browsers:
-   ```cmd
-   playwright install chromium
+   pip install -r medium_publisher/requirements.txt
    ```
 
 ## Building the Executable
 
 ### Automated Build (Recommended)
 
-Run the build script:
+Run the build script from the `medium_publisher/` directory:
 
 ```cmd
 build.cmd
 ```
 
 This script will:
-1. Install PyInstaller
+1. Install PyInstaller if not present
 2. Clean previous builds
-3. Build the executable using PyInstaller
-4. Verify the build
+3. Build the executable using PyInstaller with `medium_publisher.spec`
+4. Verify the build output
 
 ### Manual Build
 
-If you prefer to build manually:
-
 ```cmd
+cd medium_publisher
 pyinstaller medium_publisher.spec
 ```
 
@@ -80,7 +65,18 @@ pyinstaller medium_publisher.spec
 After successful build:
 - **Executable**: `dist\MediumArticlePublisher.exe`
 - **Build files**: `build\` directory (can be deleted)
-- **Size**: ~50-100 MB (without Playwright browsers)
+- **Size**: ~80-150 MB (includes PyQt6, Pillow, pyautogui, and all dependencies)
+
+### What Gets Bundled
+
+PyInstaller bundles:
+- Python interpreter
+- All pip dependencies (PyQt6, pyautogui, pynput, Pillow, pywin32, etc.)
+- Reference PNG images from `assets/medium/`
+- Default configuration from `config/`
+- Application source code (compiled to .pyc)
+
+No external browser or browser engine is bundled — the app uses the user's existing browser via OS-level input.
 
 ## Testing the Executable
 
@@ -98,63 +94,36 @@ After successful build:
 
 3. Verify:
    - Application launches without errors
-   - UI displays correctly
-   - Configuration files are loaded
+   - PyQt6 GUI displays correctly
+   - Settings dialog opens and saves
+   - File selection works
    - Logging works
 
-### Clean Machine Testing
+### Testing on Another Machine
 
-**IMPORTANT**: Test on a clean Windows machine without Python or development tools installed.
+Test on a Windows machine to verify all DLLs are bundled:
 
-#### Test Environment Setup
-
-1. **Virtual Machine** (Recommended)
-   - Use Windows 10/11 VM
-   - No Python installed
-   - No development tools
-   - Fresh Windows installation
-
-2. **Physical Machine**
-   - Borrow a non-developer machine
-   - Or use Windows Sandbox
-
-#### Test Procedure
-
-1. Copy the entire `dist\` directory to the test machine
-
+1. Copy the `dist\` directory to the test machine
 2. Run `MediumArticlePublisher.exe`
-
-3. Install Playwright browsers:
-   ```cmd
-   setup_playwright.cmd
-   ```
-
-4. Test all features:
-   - [ ] File selection
-   - [ ] Article parsing
-   - [ ] Configuration settings
-   - [ ] Login (both methods)
-   - [ ] Publishing workflow
-   - [ ] Version updates
-   - [ ] Batch publishing
-   - [ ] Error handling
-
-5. Check for missing dependencies:
-   - DLL errors
-   - Import errors
-   - Runtime errors
+3. Test all features:
+   - [ ] Application launches
+   - [ ] File selection works
+   - [ ] Article parsing displays info
+   - [ ] Settings persist
+   - [ ] Screen recognition finds reference images
+   - [ ] OS-level typing works
+   - [ ] Emergency stop triggers correctly
 
 #### Common Issues
 
 **Issue**: "VCRUNTIME140.dll not found"
-**Solution**: Install Visual C++ Redistributable
-- Download: https://aka.ms/vs/17/release/vc_redist.x64.exe
-
-**Issue**: "Playwright browser not found"
-**Solution**: Run `setup_playwright.cmd`
+**Solution**: Install Visual C++ Redistributable (https://aka.ms/vs/17/release/vc_redist.x64.exe)
 
 **Issue**: Application crashes on startup
-**Solution**: Check Windows Event Viewer for error details
+**Solution**: Run from command prompt to see error output; check Windows Event Viewer
+
+**Issue**: pyautogui fails with DPI error
+**Solution**: Right-click exe → Properties → Compatibility → "Override high DPI scaling" → "Application"
 
 ## Creating the Installer
 
@@ -164,22 +133,20 @@ Install Inno Setup 6.x from https://jrsoftware.org/isinfo.php
 
 ### Automated Installer Creation
 
-Run the installer creation script:
+Run from the `medium_publisher/` directory:
 
 ```cmd
 create_installer.cmd
 ```
 
 This script will:
-1. Verify executable exists
+1. Verify the executable exists in `dist\`
 2. Check Inno Setup installation
-3. Create placeholder files (LICENSE.txt, icon.ico)
-4. Build installer using Inno Setup
-5. Verify installer creation
+3. Create placeholder files (LICENSE.txt, icon.ico) if missing
+4. Compile the installer using `installer.iss`
+5. Output the installer to `installer_output\`
 
 ### Manual Installer Creation
-
-If you prefer to build manually:
 
 ```cmd
 iscc installer.iss
@@ -187,18 +154,16 @@ iscc installer.iss
 
 ### Installer Output
 
-After successful build:
 - **Installer**: `installer_output\MediumArticlePublisher_Setup_v0.1.0.exe`
-- **Size**: ~50-100 MB
-- **Type**: Windows executable installer
+- **Size**: ~80-150 MB
 
 ### Installer Features
 
 The installer includes:
-- Application executable
-- Configuration files
+- Application executable and bundled dependencies
+- Reference PNG images for screen recognition
+- Default configuration files
 - Documentation
-- Playwright setup script
 - Start menu shortcuts
 - Optional desktop shortcut
 - Uninstaller
@@ -209,203 +174,93 @@ Edit `installer.iss` to customize:
 - Application name and version
 - Publisher information
 - Installation directory
-- Shortcuts
+- Shortcuts and icons
 - License agreement
-- Pre/post-installation scripts
-
-## Creating Desktop Shortcuts
-
-### Automated Shortcut Creation
-
-Run the VBScript:
-
-```cmd
-cscript create_shortcut.vbs
-```
-
-This creates a shortcut on the user's desktop pointing to the executable.
-
-### Manual Shortcut Creation
-
-1. Right-click on desktop
-2. Select "New" → "Shortcut"
-3. Browse to `dist\MediumArticlePublisher.exe`
-4. Name: "Medium Article Publisher"
-5. Click "Finish"
-
-### Shortcut Properties
-
-Recommended settings:
-- **Target**: `path\to\dist\MediumArticlePublisher.exe`
-- **Start in**: `path\to\dist`
-- **Run**: Normal window
-- **Icon**: Custom icon (if available)
 
 ## Distribution
 
 ### Distribution Methods
 
-#### 1. Standalone Executable
+#### 1. Standalone Executable (Portable)
 
-**Pros**:
-- No installation required
-- Portable
-- Easy to update
+**Pros**: No installation required, portable, easy to update
+**Cons**: No Start menu integration, no uninstaller
 
-**Cons**:
-- Requires manual Playwright setup
-- No Start menu integration
-- No uninstaller
-
-**Distribution**:
+**Steps**:
 1. Zip the `dist\` directory
-2. Include `setup_playwright.cmd`
-3. Include README with instructions
-4. Upload to file sharing service or GitHub releases
+2. Include a README with instructions
+3. Upload to file sharing or GitHub releases
 
 #### 2. Installer Package
 
-**Pros**:
-- Professional installation experience
-- Automatic shortcuts
-- Uninstaller included
-- Can bundle Playwright setup
+**Pros**: Professional install experience, shortcuts, uninstaller
+**Cons**: Larger file, requires admin privileges
 
-**Cons**:
-- Larger file size
-- Requires admin privileges
-- More complex to create
-
-**Distribution**:
+**Steps**:
 1. Build installer using `create_installer.cmd`
-2. Test installer on clean machine
-3. Upload to website or GitHub releases
-4. Provide download link to users
-
-### File Hosting Options
-
-- **GitHub Releases**: Free, version tracking, changelog
-- **Google Drive**: Easy sharing, no size limits
-- **Dropbox**: Simple links, good for teams
-- **OneDrive**: Microsoft integration
-- **Self-hosted**: Full control, custom domain
+2. Test on a clean machine
+3. Upload to distribution channel
 
 ### Version Numbering
 
-Follow Semantic Versioning (SemVer):
-- **Major.Minor.Patch** (e.g., 1.0.0)
-- **Major**: Breaking changes
-- **Minor**: New features (backward compatible)
-- **Patch**: Bug fixes
+Follow Semantic Versioning: **Major.Minor.Patch** (e.g., 1.0.0)
 
 Update version in:
-- `main.py` (app version)
+- `main.py` (app version constant)
 - `installer.iss` (installer version)
-- `README.md` (documentation)
+- `README.md`
 
 ## Troubleshooting
 
 ### Build Issues
 
-#### PyInstaller Errors
-
 **Error**: "Module not found"
 **Solution**: Add module to `hiddenimports` in `medium_publisher.spec`
 
 **Error**: "Failed to execute script"
-**Solution**: Run with `--debug all` flag to see detailed errors
+**Solution**: Run with `--debug all` flag for detailed errors
 
-**Error**: "UPX is not available"
-**Solution**: Install UPX or set `upx=False` in spec file
-
-#### Missing Dependencies
-
-**Error**: DLL not found
-**Solution**: 
-1. Check if DLL is in `dist\` directory
-2. Add to `binaries` in spec file
-3. Install Visual C++ Redistributable
+**Error**: Missing DLL in dist
+**Solution**: Add to `binaries` list in spec file; install Visual C++ Redistributable
 
 ### Runtime Issues
 
-#### Application Won't Start
+**Error**: Application won't start on target machine
+**Solution**: Run from command prompt to see error; check for missing DLLs
 
-1. Check Windows Event Viewer
-2. Run from command prompt to see errors
-3. Verify all dependencies are included
-4. Test on clean machine
+**Error**: pyautogui import fails in packaged app
+**Solution**: Ensure `pyautogui`, `pynput`, and `Pillow` are in `hiddenimports`
 
-#### Playwright Issues
-
-**Error**: "Browser not found"
-**Solution**: Run `setup_playwright.cmd`
-
-**Error**: "Browser download failed"
-**Solution**: 
-1. Check internet connection
-2. Check firewall settings
-3. Manually download browser
+**Error**: Reference images not found
+**Solution**: Verify `assets/medium/` is included in the PyInstaller `datas` list in the spec file
 
 ### Installer Issues
 
-#### Inno Setup Errors
+**Error**: "File not found" during Inno Setup compilation
+**Solution**: Verify all source files referenced in `installer.iss` exist
 
-**Error**: "File not found"
-**Solution**: Verify all source files exist
-
-**Error**: "Invalid script"
-**Solution**: Check `installer.iss` syntax
-
-**Error**: "Compilation failed"
-**Solution**: Check Inno Setup compiler output for details
+**Error**: Installer fails on target machine
+**Solution**: Check that Visual C++ Redistributable is installed
 
 ## Best Practices
 
 ### Before Release
 
-- [ ] Test on multiple Windows versions (10, 11)
-- [ ] Test on clean machines without Python
-- [ ] Verify all features work
-- [ ] Check for memory leaks
-- [ ] Test error handling
-- [ ] Verify logging works
-- [ ] Test uninstaller (if using installer)
-- [ ] Update documentation
+- [ ] Test on Windows 10 and Windows 11
+- [ ] Test at 100% and 150% display scaling
+- [ ] Verify all reference images are bundled
+- [ ] Check emergency stop works in packaged version
+- [ ] Test file selection and article parsing
+- [ ] Verify logging works (log file created)
 - [ ] Update version numbers
 - [ ] Create release notes
 
 ### Security
 
-- [ ] Sign executable with code signing certificate
-- [ ] Scan for viruses/malware
-- [ ] Use HTTPS for downloads
-- [ ] Verify file integrity (checksums)
 - [ ] Don't include sensitive data in build
-
-### Documentation
-
-- [ ] Include README in distribution
-- [ ] Provide installation instructions
-- [ ] Document system requirements
-- [ ] Include troubleshooting guide
-- [ ] Provide contact information
-
-## Additional Resources
-
-- **PyInstaller Documentation**: https://pyinstaller.org/
-- **Inno Setup Documentation**: https://jrsoftware.org/ishelp/
-- **Playwright Documentation**: https://playwright.dev/python/
-- **PyQt6 Documentation**: https://www.riverbankcomputing.com/static/Docs/PyQt6/
-
-## Support
-
-For issues or questions:
-1. Check this documentation
-2. Review troubleshooting section
-3. Check GitHub issues
-4. Contact support
+- [ ] Sign executable with code signing certificate (if available)
+- [ ] Provide checksums for downloads
 
 ---
 
 **Last Updated**: 2025-03-01
-**Version**: 0.1.0

@@ -11,6 +11,8 @@ Manual functional test plan for validating all features of the Medium Keyboard P
 - Browser: Chrome or Edge
 - Medium account with Google OAuth
 - Display: consistent scaling (100% or 150%)
+- Launch: `python -m medium_publisher.main` from workspace root
+- Venv: `venv\Scripts\activate` from workspace root
 - Test article files prepared (see Appendix A)
 
 ## Status Tracking
@@ -110,11 +112,11 @@ Manual functional test plan for validating all features of the Medium Keyboard P
 ### FT-4.2: Detects logged-out state ⬜
 1. Ensure you're logged out of Medium
 2. Start typing
-3. **Expected**: App detects logged-out homepage and clicks "Sign in"
+3. **Expected**: App detects logged-out homepage via screen recognition and clicks "Sign in"
 
 ### FT-4.3: Navigates Google OAuth ⬜
 1. Start from logged-out state
-2. **Expected**: App clicks "Sign in with Google"
+2. **Expected**: App clicks "Sign in with Google" (locates button via reference image)
 3. **Expected**: App selects the configured Google account
 4. **Expected**: If 2FA required, status shows "Complete 2FA in the browser"
 
@@ -159,7 +161,7 @@ Manual functional test plan for validating all features of the Medium Keyboard P
 3. **Expected**: Italic text is typed, selected backwards, then Ctrl+I applied
 
 ### FT-5.4: Inline code ⬜
-1. Use an article with `` `inline code` `` 
+1. Use an article with `` `inline code` ``
 2. **Expected**: Text is wrapped in backtick characters
 
 ### FT-5.5: Links ⬜
@@ -204,7 +206,7 @@ Manual functional test plan for validating all features of the Medium Keyboard P
 
 ### FT-6.2: Thinking pauses ⬜
 1. Watch typing between sentences and paragraphs
-2. **Expected**: Brief pauses between sentences (0.5–2s) and longer pauses between paragraphs (1–3s)
+2. **Expected**: Brief pauses between sentences (100-500ms) and longer pauses between paragraphs
 
 ### FT-6.3: Immediate typo correction ⬜
 1. Set typo frequency to "medium" (5%) in Settings
@@ -244,7 +246,7 @@ Manual functional test plan for validating all features of the Medium Keyboard P
 ### FT-7.4: Pause and resume ⬜
 1. Start typing an article
 2. Click "Pause"
-3. **Expected**: Typing stops after current word, button changes to "Resume"
+3. **Expected**: Typing stops after current character, button changes to "Resume"
 4. Click "Resume"
 5. **Expected**: Typing continues from where it paused
 
@@ -313,7 +315,7 @@ Manual functional test plan for validating all features of the Medium Keyboard P
 2. **Expected**: Settings dialog appears with all sections (Typing, Safety, Navigation, Paths, UI)
 
 ### FT-10.2: Typing speed change ⬜
-1. Change base delay to 100ms (faster)
+1. Change base delay to 80ms (faster)
 2. Save and start typing
 3. **Expected**: Typing is noticeably faster
 
@@ -367,9 +369,9 @@ Manual functional test plan for validating all features of the Medium Keyboard P
 
 ### FT-12.2: Error during typing ⬜
 1. Simulate an error (e.g., close the browser mid-typing)
-2. **Expected**: Emergency stop triggers automatically
+2. **Expected**: Emergency stop triggers automatically (focus lost)
 3. **Expected**: Error message displayed
-4. **Expected**: Typing progress saved to session
+4. **Expected**: All modifier keys released
 
 ### FT-12.3: Log file written ⬜
 1. Run the application and perform some actions

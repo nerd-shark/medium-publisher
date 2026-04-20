@@ -4,24 +4,17 @@
 1. [Configuration Files](#configuration-files)
 2. [Typing Configuration](#typing-configuration)
 3. [Publishing Configuration](#publishing-configuration)
-4. [Browser Configuration](#browser-configuration)
-5. [Paths Configuration](#paths-configuration)
-6. [Credentials Configuration](#credentials-configuration)
-7. [Selector Configuration](#selector-configuration)
+4. [Safety Configuration](#safety-configuration)
+5. [Navigation Configuration](#navigation-configuration)
+6. [UI Configuration](#ui-configuration)
+7. [Assets Configuration](#assets-configuration)
 8. [Advanced Configuration](#advanced-configuration)
 
 ## Configuration Files
 
 ### Location
 
-**User Configuration**: `~/.medium_publisher/config.yaml`
-**Default Configuration**: `medium_publisher/config/default_config.yaml`
-**Selectors**: `medium_publisher/config/selectors.yaml`
-
-### Configuration Hierarchy
-
-1. User configuration (`~/.medium_publisher/config.yaml`) - highest priority
-2. Default configuration (`config/default_config.yaml`) - fallback values
+**Default Configuration**: `config/default_config.yaml`
 
 ### Configuration Format
 
@@ -29,7 +22,7 @@ YAML format with nested sections:
 
 ```yaml
 typing:
-  speed_ms: 30
+  base_delay_ms: 150
   # ... more typing settings
 
 publishing:
@@ -39,78 +32,72 @@ publishing:
 
 ## Typing Configuration
 
-### speed_ms
+### base_delay_ms
 
 **Description**: Base delay between keystrokes in milliseconds
 **Type**: Integer
-**Range**: 10-100
-**Default**: 30
-**UI**: Typing Speed slider in Settings
+**Default**: 150
 
 **Effect**:
-- Lower values = faster typing (less human-like)
-- Higher values = slower typing (more human-like)
-- Actual delay varies ±20% per character
+- Lower values = faster typing
+- Higher values = slower, more human-like typing
+- Actual delay varies based on `variation_percent`
 
-**Examples**:
-- 10ms: Very fast (600 chars/min theoretical, limited by rate limiter)
-- 30ms: Moderate (200 chars/min theoretical, limited by rate limiter)
-- 50ms: Slow (120 chars/min theoretical, limited by rate limiter)
-- 100ms: Very slow (60 chars/min theoretical, limited by rate limiter)
+### variation_percent
 
-**Note**: All speeds are limited by the 35 chars/min rate limit.
-
-### paragraph_delay_ms
-
-**Description**: Delay between paragraphs
+**Description**: Random variation applied to base delay
 **Type**: Integer
-**Range**: 0-1000
-**Default**: 100
-**UI**: Not exposed (advanced setting)
+**Default**: 30
 
-**Effect**: Natural pause between paragraphs
-
-### max_chars_per_minute
-
-**Description**: Maximum characters per minute (rate limit)
-**Type**: Integer
-**Range**: Fixed at 35
-**Default**: 35
-**UI**: Display only (non-editable)
-
-**Effect**: Hard limit enforced by sliding window algorithm
-
-**Why 35?**: Medium's rate limit to prevent automated spam
+**Effect**: Each keystroke delay is `base_delay_ms ± variation_percent%`. A value of 30 means delays range from 105ms to 195ms (with base of 150ms).
 
 ### human_typing_enabled
 
 **Description**: Enable human-like typing simulation
 **Type**: Boolean
-**Values**: true, false
 **Default**: true
-**UI**: "Human-like typing" checkbox in Settings
 
 **Effect**:
-- true: Enables typos, corrections, speed variations, thinking pauses
-- false: Consistent typing without typos (still rate-limited)
+- true: Enables speed variations, thinking pauses, paragraph pauses, and optional typos
+- false: Consistent typing at base_delay_ms rate
 
 ### typo_frequency
 
-**Description**: Frequency of typos when human typing is enabled
+**Description**: Frequency of intentional typos when human typing is enabled
 **Type**: String
-**Values**: low, medium, high
-**Default**: low
-**UI**: "Typo Frequency" dropdown in Settings
+**Values**: "none", "low", "medium", "high"
+**Default**: "none"
 
 **Effect**:
-- low: 2% typo rate (~1 typo per 50 characters)
-- medium: 5% typo rate (~1 typo per 20 characters)
-- high: 8% typo rate (~1 typo per 12.5 characters)
+- "none": No typos generated
+- "low": Occasional typos (~2%)
+- "medium": Moderate typos (~5%)
+- "high": Frequent typos (~8%)
 
-**Time Overhead**:
-- low: +8% typing time
-- medium: +20% typing time
-- high: +32% typing time
+### immediate_correction_ratio
+
+**Description**: Ratio of typos corrected immediately vs. deferred
+**Type**: Float
+**Range**: 0.0 - 1.0
+**Default**: 0.70
+
+**Effect**: 0.70 means 70% of typos are corrected immediately (backspace + retype), while 30% are deferred and corrected later in a batch.
+
+### thinking_pause_min_ms / thinking_pause_max_ms
+
+**Description**: Range for random "thinking" pauses between words or sentences
+**Type**: Integer
+**Default**: Configured in default_config.yaml
+
+**Effect**: Simulates natural pauses where a human would think before continuing.
+
+### paragraph_pause_min_ms / paragraph_pause_max_ms
+
+**Description**: Range for pauses between paragraphs
+**Type**: Integer
+**Default**: Configured in default_config.yaml
+
+**Effect**: Longer pauses between paragraphs to simulate reading/thinking between sections.
 
 ## Publishing Configuration
 
@@ -118,285 +105,158 @@ publishing:
 
 **Description**: Default publishing mode
 **Type**: String
-**Values**: draft, public
-**Default**: draft
-**UI**: "Default Mode" radio buttons in Settings
+**Values**: "draft", "public"
+**Default**: "draft"
 
 **Effect**:
-- draft: Articles saved as draft (not published)
-- public: Articles published immediately
-
-**Recommendation**: Use draft mode for review before publishing
-
-### auto_add_tags
-
-**Description**: Automatically add tags from frontmatter
-**Type**: Boolean
-**Values**: true, false
-**Default**: true
-**UI**: Not exposed (always enabled)
-
-**Effect**: Tags from frontmatter are added to Medium article
+- "draft": Articles saved as draft (not published)
+- "public": Articles published immediately
 
 ### max_tags
 
-**Description**: Maximum number of tags
+**Description**: Maximum number of tags per article
 **Type**: Integer
-**Range**: 1-5
 **Default**: 5
-**UI**: Not exposed (Medium's limit)
 
-**Effect**: Only first 5 tags are used if more are provided
+**Effect**: Only first 5 tags from frontmatter are used (Medium's limit).
 
-### remember_draft_url
+## Safety Configuration
 
-**Description**: Remember last used draft URL
-**Type**: Boolean
-**Values**: true, false
-**Default**: true
-**UI**: Not exposed (always enabled)
+### emergency_stop_hotkey
 
-**Effect**: Draft URL field pre-filled with last used URL
+**Description**: Keyboard shortcut to immediately stop all automation
+**Type**: String
+**Default**: "ctrl+shift+escape"
 
-## Browser Configuration
+**Effect**: Pressing this hotkey at any time raises `EmergencyStopError` and halts all typing/navigation. Monitored via pynput keyboard listener.
 
-### headless
+### countdown_seconds
 
-**Description**: Run browser in headless mode (no visible window)
-**Type**: Boolean
-**Values**: true, false
-**Default**: false
-**UI**: "Browser Visibility" checkbox in Settings
-
-**Effect**:
-- false: Browser window visible (recommended)
-- true: Browser runs in background (faster, harder to debug)
-
-**Recommendation**: Use visible mode for first-time setup and debugging
-
-### timeout_seconds
-
-**Description**: Default timeout for browser operations
+**Description**: Countdown before typing begins
 **Type**: Integer
-**Range**: 10-120
-**Default**: 30
-**UI**: Not exposed (advanced setting)
+**Default**: 3
 
-**Effect**: Maximum wait time for page loads and element detection
+**Effect**: Gives user time to position cursor or cancel before automation starts.
 
-## Paths Configuration
+### focus_check_enabled
 
-### last_directory
-
-**Description**: Last directory used in file selector
-**Type**: String
-**Default**: "" (empty)
-**UI**: Automatically updated when selecting files
-
-**Effect**: File selector opens to this directory
-
-### articles_directory
-
-**Description**: Default directory for articles
-**Type**: String
-**Default**: "" (empty)
-**UI**: "Default Article Directory" in Settings
-
-**Effect**: File selector starts here if no last_directory
-
-### last_draft_url
-
-**Description**: Last used Medium draft URL
-**Type**: String
-**Default**: "" (empty)
-**UI**: Automatically updated when entering draft URL
-
-**Effect**: Draft URL field pre-filled with this value
-
-## Credentials Configuration
-
-### remember_login
-
-**Description**: Save session cookies for reuse
+**Description**: Whether to verify the target window has focus before typing
 **Type**: Boolean
-**Values**: true, false
-**Default**: false
-**UI**: "Remember Login" checkbox in Settings
+**Default**: true
 
 **Effect**:
-- true: Session cookies saved to `~/.medium_publisher/session_cookies.json`
-- false: Re-authenticate each launch
+- true: Typing pauses if the target window loses focus, raises `FocusLostError`
+- false: Types regardless of window focus (not recommended)
 
-**Security**: Cookies stored in user home directory with restricted permissions
+## Navigation Configuration
 
-## Selector Configuration
+### screen_confidence
 
-### File: selectors.yaml
+**Description**: Minimum confidence threshold for screen recognition matches
+**Type**: Float
+**Range**: 0.0 - 1.0
+**Default**: 0.8
 
-Contains CSS selectors for Medium's web interface. These may need updates if Medium changes their UI.
+**Effect**: When matching reference PNG images against the screen, matches below this confidence are rejected. Lower values = more permissive matching, higher values = stricter.
 
-### Login Selectors
+### poll_interval_seconds
 
-```yaml
-medium:
-  login:
-    sign_in_button: 'a[href*="sign-in"]'
-    google_oauth_button: 'button:has-text("Sign in with Google")'
-    email_input: 'input[type="email"]'
-    password_input: 'input[type="password"]'
-    continue_button: 'button:has-text("Continue")'
-```
+**Description**: How often to poll the screen for state changes
+**Type**: Integer
+**Default**: 2
 
-### Logged In Indicators
+**Effect**: The NavigationStateMachine checks the screen every N seconds to detect page transitions.
 
-```yaml
-  logged_in_indicators:
-    user_menu: '[data-testid="user-menu"]'
-    profile_image: 'img[alt*="profile"]'
-    new_story_button: 'a[href="/new-story"]'
-```
+### login_timeout_seconds
 
-### Editor Selectors
+**Description**: Maximum time to wait for user to complete login
+**Type**: Integer
+**Default**: 300
 
-```yaml
-  editor:
-    new_story_link: 'a[href="/new-story"]'
-    title_field: '[data-testid="storyTitle"]'
-    content_area: '[data-testid="storyContent"]'
-    publish_button: 'button:has-text("Publish")'
-```
+**Effect**: If login is not detected within this time, a `NavigationError` is raised. The user completes OAuth manually in their browser.
 
-### Publishing Selectors
+### page_load_timeout_seconds
 
-```yaml
-  publishing:
-    tags_input: 'input[placeholder*="tags"]'
-    subtitle_input: 'input[placeholder*="subtitle"]'
-    draft_button: 'button:has-text("Save as draft")'
-    public_button: 'button:has-text("Publish now")'
-```
+**Description**: Maximum time to wait for a page to load
+**Type**: Integer
+**Default**: 30
 
-### Draft Selectors
+**Effect**: After navigation, the app waits up to this duration for the expected screen state to appear.
 
-```yaml
-  draft:
-    editor_content: '[contenteditable="true"]'
-    clear_all: 'button[aria-label="Clear"]'
-```
+### google_account_email
 
-### Keyboard Shortcuts
+**Description**: Google account email for login detection
+**Type**: String
+**Default**: "" (empty)
 
-```yaml
-formatting:
-  bold: "Control+B"
-  italic: "Control+I"
-  code: "Control+Alt+6"
-  header_2: "Control+Alt+2"
-  header_3: "Control+Alt+3"
-  link: "Control+K"
-```
+**Effect**: Used by the login flow to identify which Google account to expect during OAuth.
+
+## UI Configuration
+
+### always_on_top
+
+**Description**: Keep application window above other windows
+**Type**: Boolean
+**Default**: true
+
+**Effect**: The publisher window stays visible even when the browser has focus.
+
+### remember_window_position
+
+**Description**: Save and restore window position between sessions
+**Type**: Boolean
+**Default**: true
+
+### remember_last_directory
+
+**Description**: Remember the last directory used in file selection
+**Type**: Boolean
+**Default**: true
+
+## Assets Configuration
+
+### reference_images_dir
+
+**Description**: Directory containing reference PNG images for screen recognition
+**Type**: String
+**Default**: "assets/medium/"
+
+**Effect**: The ScreenRecognition module loads reference images from this directory to identify UI states (login buttons, editor fields, navigation elements).
+
+**Contents**: PNG screenshots of Medium UI elements used for matching:
+- Login page indicators
+- Editor state indicators
+- Navigation elements
+- Button states
 
 ## Advanced Configuration
 
 ### Manual Configuration File Editing
 
-1. Locate user configuration:
+1. Open the config file:
    ```cmd
-   cd %USERPROFILE%\.medium_publisher
-   notepad config.yaml
+   notepad config\default_config.yaml
    ```
 
 2. Edit values in YAML format
-
 3. Save and restart application
 
 ### Configuration Validation
 
-The application validates configuration on startup:
-- Type checking (integer, boolean, string)
-- Range checking (min/max values)
-- Enum validation (valid options)
+The ConfigManager validates configuration on load:
+- Type checking (integer, boolean, string, float)
+- Range checking where applicable
+- Missing keys filled with defaults
 
 Invalid values are replaced with defaults and logged.
 
 ### Resetting Configuration
 
-To reset to defaults:
+To reset to defaults, restore the original `config/default_config.yaml` from version control:
 
 ```cmd
-REM Delete user configuration
-del %USERPROFILE%\.medium_publisher\config.yaml
-
-REM Restart application (will recreate with defaults)
+git checkout -- config\default_config.yaml
 ```
-
-### Configuration Backup
-
-Backup your configuration:
-
-```cmd
-REM Backup
-copy %USERPROFILE%\.medium_publisher\config.yaml config_backup.yaml
-
-REM Restore
-copy config_backup.yaml %USERPROFILE%\.medium_publisher\config.yaml
-```
-
-### Environment-Specific Configuration
-
-For different environments (e.g., testing vs production):
-
-1. Create multiple configuration files:
-   - `config_test.yaml`
-   - `config_prod.yaml`
-
-2. Copy desired config before launching:
-   ```cmd
-   copy config_test.yaml %USERPROFILE%\.medium_publisher\config.yaml
-   python main.py
-   ```
-
-### Logging Configuration
-
-Logging is configured in code, not in YAML. To adjust log levels:
-
-1. Edit `medium_publisher/utils/logger.py`
-2. Change `default_level` in `LoggerConfig`
-3. Restart application
-
-**Log Levels**:
-- DEBUG: Detailed debugging information
-- INFO: General information (default)
-- WARNING: Warning messages
-- ERROR: Error messages
-- CRITICAL: Critical errors
-
-### Session State Configuration
-
-Session state is stored in:
-- `~/.medium_publisher/session_state.json`
-
-Contains:
-- Current version
-- Completed versions
-- Article path
-- Draft URL
-- Progress information
-
-**Manual Editing**: Not recommended (managed by application)
-
-### Cookie Storage Configuration
-
-Session cookies are stored in:
-- `~/.medium_publisher/session_cookies.json`
-
-Contains:
-- Medium session cookies
-- Expiration timestamps
-
-**Security**: File has restricted permissions (user read/write only)
-
-**Manual Editing**: Not recommended (managed by application)
 
 ## Configuration Examples
 
@@ -404,86 +264,66 @@ Contains:
 
 ```yaml
 typing:
-  speed_ms: 10
+  base_delay_ms: 50
+  variation_percent: 10
   human_typing_enabled: false
-  max_chars_per_minute: 35  # Still enforced
+  typo_frequency: "none"
 ```
-
-**Effect**: Fastest possible typing (limited by rate limiter)
 
 ### Maximum Human-Like Behavior
 
 ```yaml
 typing:
-  speed_ms: 50
+  base_delay_ms: 200
+  variation_percent: 40
   human_typing_enabled: true
-  typo_frequency: high
-  paragraph_delay_ms: 200
+  typo_frequency: "medium"
+  immediate_correction_ratio: 0.60
 ```
 
-**Effect**: Very realistic typing with frequent typos
-
-### Production Publishing
+### Strict Safety
 
 ```yaml
-publishing:
-  default_mode: public
+safety:
+  emergency_stop_hotkey: "ctrl+shift+escape"
+  countdown_seconds: 5
+  focus_check_enabled: true
 
-browser:
-  headless: true
-  timeout_seconds: 60
-
-credentials:
-  remember_login: true
+navigation:
+  screen_confidence: 0.9
+  login_timeout_seconds: 600
 ```
-
-**Effect**: Automated publishing with saved credentials
-
-### Development/Testing
-
-```yaml
-publishing:
-  default_mode: draft
-
-browser:
-  headless: false
-  timeout_seconds: 30
-
-credentials:
-  remember_login: false
-```
-
-**Effect**: Visible browser, draft mode, no saved credentials
 
 ## Troubleshooting Configuration
 
 ### Configuration Not Loading
 
-**Symptom**: Settings changes don't persist
+**Symptom**: Settings changes don't take effect
 
 **Solution**:
-1. Check file permissions on `~/.medium_publisher/`
-2. Verify YAML syntax (use online YAML validator)
-3. Check application logs for validation errors
+1. Verify YAML syntax (use online YAML validator)
+2. Check application logs for validation errors
+3. Ensure file is saved as UTF-8
 
-### Invalid Configuration Values
+### Screen Recognition Failing
 
-**Symptom**: Application uses defaults despite custom config
-
-**Solution**:
-1. Check logs for validation errors
-2. Verify value types (integer vs string)
-3. Verify value ranges (e.g., speed_ms: 10-100)
-
-### Selectors Not Working
-
-**Symptom**: Application can't find Medium UI elements
+**Symptom**: Navigation times out, states not detected
 
 **Solution**:
-1. Medium may have changed their UI
-2. Update `selectors.yaml` with new selectors
-3. Use browser developer tools to find correct selectors
-4. Report issue for official update
+1. Increase `login_timeout_seconds` or `page_load_timeout_seconds`
+2. Lower `screen_confidence` (e.g., 0.7) if matches are close but rejected
+3. Verify reference images in `assets/medium/` match your screen resolution
+4. Check that display scaling matches the reference images
+
+### Emergency Stop Not Working
+
+**Symptom**: Hotkey doesn't stop automation
+
+**Solution**:
+1. Verify `emergency_stop_hotkey` is set correctly
+2. Ensure pynput has keyboard access permissions
+3. Try a different hotkey combination
+4. Check that no other application is capturing the same hotkey
 
 ---
 

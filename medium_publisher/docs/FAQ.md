@@ -5,39 +5,39 @@
 2. [Installation & Setup](#installation--setup)
 3. [Authentication](#authentication)
 4. [Publishing](#publishing)
-5. [Rate Limiting](#rate-limiting)
+5. [Typing Speed](#typing-speed)
 6. [Human Typing](#human-typing)
-7. [Version Management](#version-management)
-8. [Batch Publishing](#batch-publishing)
-9. [Configuration](#configuration)
-10. [Troubleshooting](#troubleshooting)
+7. [Screen Recognition](#screen-recognition)
+8. [Version Management](#version-management)
+9. [Safety Features](#safety-features)
+10. [Configuration](#configuration)
+11. [Troubleshooting](#troubleshooting)
 
 ## General Questions
 
 ### What is the Medium Article Publisher?
 
-A desktop application that automates publishing markdown articles to Medium using browser automation. It types your content into Medium's editor with realistic human-like behavior.
+A desktop application that types your markdown articles into Medium's editor using OS-level keyboard input (pyautogui) with realistic human-like behavior. It recognizes screen states via reference images rather than browser automation.
 
 ### Why use this instead of copy-paste?
 
-**Benefits**:
-- Automated formatting (headers, bold, italic, code blocks)
-- Batch publishing multiple articles
+- Automated formatting (headers, bold, italic, code blocks) via keyboard shortcuts
 - Version management for incremental updates
-- Consistent publishing workflow
-- Human-like typing to avoid detection
+- Human-like typing patterns
+- Batch publishing multiple articles
+- Consistent, repeatable workflow
 
-### Is this against Medium's Terms of Service?
+### How does it work technically?
 
-The application respects Medium's rate limits (35 chars/min) and uses human-like typing patterns. However, automation is a gray area. Use responsibly and at your own risk.
+The app uses:
+- **pyautogui** to send keystrokes at the OS level (same as physically typing)
+- **pynput** to monitor keyboard for emergency stop
+- **Screen recognition** (reference PNG images) to detect navigation states
+- **No browser automation** — your regular browser is used as-is
 
 ### What platforms are supported?
 
 Currently Windows 10/11 only. Linux and macOS support may be added in the future.
-
-### Is this free?
-
-Yes, the application is free and open source.
 
 ## Installation & Setup
 
@@ -45,83 +45,74 @@ Yes, the application is free and open source.
 
 - Windows 10/11 (64-bit)
 - Python 3.11+
-- 4 GB RAM (8 GB recommended)
-- 500 MB disk space
+- 4 GB RAM
 - Internet connection
+- A browser where you're logged into Medium (or can log in)
 
 ### How long does installation take?
 
-Approximately 10-15 minutes:
-- Python installation: 5 minutes
-- Dependencies: 5 minutes
-- Playwright browser: 3 minutes
-- Configuration: 2 minutes
+Approximately 3-5 minutes:
+- Python dependencies: 2-3 minutes
+- Configuration review: 1-2 minutes
 
-### Do I need to install a browser?
+No browser download required — the app uses your existing browser.
 
-No, Playwright automatically installs Chromium browser. You don't need Chrome, Firefox, or Edge.
+### Do I need to install a special browser?
 
-### Can I use my existing Chrome browser?
-
-No, the application uses Playwright's Chromium browser for automation. Your regular Chrome browser is not affected.
+No. The application sends keystrokes to whatever window has focus. You use your own browser (Chrome, Firefox, Edge, etc.) and navigate to Medium yourself or let the app guide you via screen recognition.
 
 ### Where are files stored?
 
-**Application Files**: Installation directory (e.g., `C:\medium_publisher\`)
-**User Data**: `%USERPROFILE%\.medium_publisher\`
-- Configuration: `config.yaml`
-- Session cookies: `session_cookies.json`
-- Session state: `session_state.json`
-- Logs: `logs\` directory
+- **Application**: Installation directory
+- **Configuration**: `config/default_config.yaml`
+- **Reference images**: `assets/medium/`
+- **Articles**: Wherever you keep your markdown files
+
+### How do I launch the application?
+
+```cmd
+python -m medium_publisher.main
+```
+
+Run from the workspace root directory.
 
 ## Authentication
 
-### Which authentication method should I use?
+### How does login work?
 
-**Google OAuth (Recommended)**:
-- More secure
-- Supports Google 2FA and security keys
-- No password storage
-- Session persists ~7 days
+The application does NOT log you in automatically. Instead:
 
-**Email/Password**:
-- Direct authentication
-- Faster login
-- Credentials stored in OS keychain
+1. The app detects whether you're logged in by checking the screen (reference images)
+2. If not logged in, it navigates to Medium's sign-in page
+3. **You complete the OAuth flow manually** in your browser
+4. The app detects when login succeeds (screen recognition)
+5. Publishing proceeds
 
-### How does Google OAuth work?
+### Why doesn't the app handle login automatically?
 
-1. Application opens Medium login page in browser
-2. You manually click "Sign in with Google"
-3. Complete Google authentication in browser
-4. Application detects successful login
-5. Session cookies saved for reuse
+Because there's no browser automation (no Playwright/Selenium). The app only sends keystrokes and reads the screen. OAuth flows require clicking specific UI elements that change frequently — manual login is more reliable and secure.
 
-### Is my password stored?
+### How long do I have to log in?
 
-**Google OAuth**: No password stored (you authenticate directly with Google)
-**Email/Password**: Password stored in Windows Credential Manager (OS keychain)
+Default: 300 seconds (5 minutes), configurable via `navigation.login_timeout_seconds`.
 
-### How long do sessions last?
+### What if I'm already logged in?
 
-Approximately 7 days (Medium's default). After expiration, you must re-authenticate.
+The app detects this via screen recognition and skips the login wait entirely.
 
-### Can I use multiple Medium accounts?
+### Does the app store my credentials?
 
-Yes, but you must log out and log in with different account each time. The application doesn't support account switching without re-authentication.
+No. The app never sees or stores your password. You authenticate directly in your browser.
 
-### What if I have 2FA enabled?
+### Can I use Google 2FA / security keys?
 
-**Google OAuth**: Complete 2FA in browser during OAuth flow
-**Email/Password**: Application pauses for 2FA entry in browser
-
-Both methods support 2FA without issues.
+Yes — since you complete login manually in your browser, any authentication method Google supports will work.
 
 ## Publishing
 
 ### What markdown features are supported?
 
-**Supported**:
+**Supported** (typed with keyboard shortcuts):
 - Headers (##, ###)
 - Bold (**text**)
 - Italic (*text*)
@@ -133,364 +124,207 @@ Both methods support 2FA without issues.
 - Paragraphs
 
 **Not Supported** (placeholders inserted):
-- Tables (TODO: Insert table here)
-- Images (TODO: Insert image here - [alt text])
+- Tables (TODO placeholder)
+- Images (TODO placeholder)
 
 ### Why aren't tables and images supported?
 
-Medium's editor doesn't support typing tables or uploading images via automation. You must manually insert them after publishing.
+These require mouse interaction with Medium's UI (drag-and-drop, file pickers). Since the app uses keyboard input only, it inserts TODO placeholders for you to handle manually.
 
-### How do I insert tables and images?
+### What happens if publishing fails mid-article?
 
-1. Publish article (placeholders will be inserted)
-2. Find TODO placeholders in Medium editor
-3. Manually insert table or upload image at that location
-4. Delete TODO placeholder
-5. Publish article
-
-### Can I publish to multiple publications?
-
-Yes, but you must manually select the publication in Medium's editor after typing is complete.
-
-### Can I schedule articles for future publication?
-
-No, the application publishes immediately (as draft or public). Use Medium's scheduling feature after publishing as draft.
-
-### What happens if publishing fails?
-
-- Error message displayed with details
-- Progress saved (can resume if supported)
+- Emergency stop triggered: typing halts immediately
+- Focus lost: typing pauses, raises `FocusLostError`
+- Progress is tracked by SessionManager for potential resume
 - Logs contain detailed error information
-- Browser remains open for manual intervention
 
-## Rate Limiting
+## Typing Speed
 
-### Why is publishing so slow?
+### How fast does it type?
 
-Medium enforces a rate limit of 35 characters per minute to prevent automated spam. The application respects this limit.
+Speed is controlled by `typing.base_delay_ms` in config (default: 150ms per keystroke). With default settings:
+- ~400 characters per minute (without pauses/typos)
+- Actual speed varies with thinking pauses, paragraph pauses, and typo corrections
 
-### Can I disable rate limiting?
+### Can I make it faster?
 
-No, the 35 chars/min limit is hard-coded and non-configurable. Disabling it would risk account suspension.
+Yes. Lower `base_delay_ms`:
+- 50ms: ~1200 chars/min theoretical
+- 100ms: ~600 chars/min theoretical
+- 150ms (default): ~400 chars/min theoretical
+- 250ms: ~240 chars/min theoretical
+
+There is no hard rate limit enforced by the app. Speed is entirely controlled by your config.
+
+### Is there a rate limit?
+
+No. Unlike browser automation tools that enforce artificial rate limits, this app types at whatever speed you configure. However, typing too fast may:
+- Look less human-like
+- Potentially trigger Medium's anti-automation detection (unconfirmed)
+
+**Recommendation**: Keep `base_delay_ms` at 100+ for safety.
 
 ### How long does it take to publish an article?
 
-**Formula**: `(total_chars + typo_overhead) / 35 chars/min`
+Depends on your `base_delay_ms` setting and content length. With defaults (150ms, human typing enabled):
+- 500 chars: ~2-3 minutes
+- 2000 chars: ~8-12 minutes
+- 5000 chars: ~20-30 minutes
 
-**Examples**:
-- 500 chars: ~15-18 minutes
-- 1000 chars: ~30-35 minutes
-- 2000 chars: ~60-70 minutes
-- 5000 chars: ~2.5-3 hours
-
-### Can I speed up publishing?
-
-No, the rate limit is enforced. However, you can:
-- Disable typos (reduces overhead by 8-32%)
-- Use version workflow (update incrementally)
-- Break long articles into smaller sections
-
-### What if I need to publish quickly?
-
-For urgent publishing:
-1. Disable human typing (removes typo overhead)
-2. Use draft mode (review before publishing)
-3. Consider manual copy-paste for very short articles
-
-### Does rate limiting apply to batch publishing?
-
-Yes, rate limiting applies to all articles in a batch. Total time = sum of individual article times.
+Thinking pauses and paragraph pauses add ~20-40% overhead.
 
 ## Human Typing
 
 ### What is human typing simulation?
 
 Realistic typing behavior including:
-- Speed variations (±20% per character)
-- Occasional typos with corrections
-- Thinking pauses (100-500ms)
-- Natural rhythm
-
-### Why simulate human typing?
-
-To make automation less detectable and more natural-looking. Helps avoid triggering Medium's anti-automation measures.
+- Speed variations (±30% per keystroke by default)
+- Thinking pauses between sentences
+- Paragraph pauses between blocks
+- Optional typos with corrections
 
 ### How do typos work?
 
-1. Application decides to make a typo (based on frequency)
-2. Types adjacent key instead of intended character
-3. Continues typing 1-3 more characters
-4. Presses backspace to delete typo + extra characters
-5. Retypes correctly
-
-### What is typo frequency?
-
-- **Low (2%)**: ~1 typo per 50 characters
-- **Medium (5%)**: ~1 typo per 20 characters
-- **High (8%)**: ~1 typo per 12.5 characters
-
-### How much time do typos add?
-
-- **Low**: +8% typing time
-- **Medium**: +20% typing time
-- **High**: +32% typing time
-
-### Can I disable typos?
-
-Yes:
-1. Open Settings
-2. Uncheck "Human-like typing"
-3. Save
-4. Typing will be consistent without typos (still rate-limited)
+When `typo_frequency` is not "none":
+1. App decides to make a typo (based on configured frequency)
+2. Types an adjacent key (QWERTY layout)
+3. Either corrects immediately (backspace + retype) or defers correction
+4. `immediate_correction_ratio` controls the split (default 70% immediate)
 
 ### Are typos made in code blocks?
 
-No, typos are disabled for:
-- Code blocks
-- URLs
-- TODO placeholders
-- Special characters
+No. Typos are disabled for code blocks, URLs, and special formatting sequences.
 
-### Can I see typos being made?
+### Can I disable typos entirely?
 
-Yes, if browser is visible. You'll see:
-- Wrong character typed
-- A few more characters
-- Backspaces deleting mistakes
-- Correct character typed
+Yes. Set `typing.typo_frequency: "none"` in config (this is the default).
+
+## Screen Recognition
+
+### How does screen recognition work?
+
+The app takes screenshots and compares them against reference PNG images stored in `assets/medium/`. When a reference image matches the screen above the confidence threshold, the app knows what state it's in.
+
+### What if screen recognition fails?
+
+Common causes and fixes:
+- **Display scaling mismatch**: Reference images were captured at a different DPI. Recapture at your resolution.
+- **Theme change**: Medium updated their UI. Update reference images.
+- **Low confidence**: Lower `navigation.screen_confidence` (e.g., 0.7)
+- **Multiple monitors**: Ensure the browser is on the primary monitor
+
+### Can I update reference images?
+
+Yes. Take new screenshots of the relevant UI elements and save them as PNG files in `assets/medium/`. Match the existing naming convention.
+
+### What states does the app recognize?
+
+- `LOGGED_OUT_HOME` — Medium homepage, not logged in
+- `SIGN_IN_SCREEN` — Medium sign-in page
+- `GOOGLE_SIGN_IN` — Google OAuth page
+- `LOGGED_IN_HOME` — Medium homepage, logged in
+- `DRAFTS_PAGE` — User's drafts list
+- `NEW_STORY_EDITOR` — Medium's story editor (ready for typing)
 
 ## Version Management
 
 ### What is the version workflow?
 
-A way to update articles incrementally through multiple versions (v1, v2, v3, etc.) without retyping the entire article.
+Update articles incrementally (v1 → v2 → v3) without retyping the entire article. Only changed sections are retyped.
 
-### When should I use versions?
+### How do I use versions?
 
-- Updating existing articles
-- Iterative refinement
-- Adding new sections
-- Fixing errors or typos
-- Expanding content
-
-### How do I create versions?
-
-1. Create `article-v1.md` (initial version)
-2. Publish v1 completely
-3. Create `article-v2.md` (updated version)
-4. Write change instructions
-5. Apply changes (only modified sections are retyped)
-
-### What are change instructions?
-
-Natural language instructions describing what to change:
-
-```
-Replace the introduction with new content
-Delete the deprecated section
-Add a new conclusion
-```
+1. Publish `article-v1.md` (full article typed)
+2. Create `article-v2.md` with changes
+3. Write change instructions (what to replace/add/delete)
+4. App finds sections and applies changes (only modified content is retyped)
 
 ### What change actions are supported?
 
-- **Replace**: Find section, delete, type new content
+- **Replace**: Find section by header, delete, type new content
 - **Delete**: Remove section
-- **Update**: Same as replace
-- **Add**: Add new section at end
-- **Insert After**: Insert content after section
-- **Insert Before**: Insert content before section
+- **Add**: Append new section
+- **Insert After/Before**: Insert content relative to existing section
 
-### How does the application find sections?
+## Safety Features
 
-By searching for header text in the editor. Section names must match article headers (case-insensitive).
+### What is the emergency stop?
 
-### Can I skip versions?
+Press `Ctrl+Shift+Escape` (configurable) at any time to immediately halt all typing. This is monitored by pynput in a background thread and works regardless of which window has focus.
 
-Yes, you can go directly from v1 to v3 if needed. Version numbers are just labels.
+### What is focus checking?
 
-### Is the browser session maintained across versions?
+When `safety.focus_check_enabled` is true, the app verifies the target window has focus before each keystroke batch. If focus is lost (you clicked another window), typing pauses and raises `FocusLostError` to prevent keystrokes going to the wrong application.
 
-Yes, the same browser session is reused. No re-authentication required between versions.
+### What is the countdown?
 
-### What if a section isn't found?
-
-Error is logged and that change is skipped. Other changes are still applied. Check logs for details.
-
-## Batch Publishing
-
-### What is batch publishing?
-
-Publishing multiple articles in one session with shared authentication and sequential processing.
-
-### How many articles can I publish in a batch?
-
-No hard limit, but consider:
-- Total time (sum of individual times)
-- System resources
-- Your patience
-
-**Recommendation**: 3-5 articles per batch
-
-### Are articles published in parallel?
-
-No, articles are published sequentially (one at a time). This ensures:
-- Stable browser session
-- Proper rate limiting
-- Error isolation
-
-### What happens if one article fails?
-
-- Error is logged
-- Batch continues with remaining articles
-- Summary report shows which articles failed
-- Failed articles can be republished individually
-
-### Can I cancel batch publishing?
-
-Yes, click the Cancel button. Current article will complete, remaining articles will be skipped.
-
-### How is progress tracked?
-
-- Overall progress bar (0-100%)
-- Article count (e.g., "Article 2 of 5")
-- Current operation status
-- Elapsed and remaining time
-
-### Is authentication shared across articles?
-
-Yes, single browser session and authentication for all articles in batch.
+Before typing begins, a countdown (default 3 seconds) gives you time to position your cursor or cancel. Configurable via `safety.countdown_seconds`.
 
 ## Configuration
 
 ### Where is configuration stored?
 
-**User Configuration**: `%USERPROFILE%\.medium_publisher\config.yaml`
-**Default Configuration**: `medium_publisher\config\default_config.yaml`
+`config/default_config.yaml` in the project directory.
 
 ### How do I change settings?
 
-**Via UI** (Recommended):
-1. Click Settings button (⚙️)
-2. Modify settings
-3. Click Save
+Edit `config/default_config.yaml` directly, or use the Settings UI in the application.
 
-**Via File**:
-1. Edit `%USERPROFILE%\.medium_publisher\config.yaml`
-2. Save file
-3. Restart application
+### What are the main config sections?
 
-### What settings can I configure?
-
-- Typing speed (10-100ms)
-- Human typing (enabled/disabled)
-- Typo frequency (low/medium/high)
-- Default publish mode (draft/public)
-- Browser visibility (visible/headless)
-- Default article directory
-- Remember login (enabled/disabled)
-
-### Can I have different configurations for different projects?
-
-Yes, manually:
-1. Create multiple config files (e.g., `config_project1.yaml`)
-2. Copy desired config before launching
-3. Application loads from standard location
+- `typing`: Speed, variation, human typing, typos
+- `publishing`: Default mode, max tags
+- `safety`: Emergency stop, countdown, focus check
+- `navigation`: Screen confidence, timeouts, email
+- `ui`: Window behavior
+- `assets`: Reference images directory
 
 ### How do I reset to defaults?
 
 ```cmd
-REM Delete user configuration
-del %USERPROFILE%\.medium_publisher\config.yaml
-
-REM Restart application (recreates with defaults)
+git checkout -- config\default_config.yaml
 ```
-
-### Are credentials stored in configuration?
-
-No, credentials are stored separately:
-- **Session cookies**: `session_cookies.json`
-- **Passwords**: Windows Credential Manager (OS keychain)
 
 ## Troubleshooting
 
 ### Application won't start
 
-**Solutions**:
-1. Verify Python installed: `python --version`
-2. Activate virtual environment: `venv\Scripts\activate`
-3. Reinstall dependencies: `pip install -r requirements.txt`
-4. Check logs: `%USERPROFILE%\.medium_publisher\logs\`
+1. Verify Python: `python --version` (need 3.11+)
+2. Install dependencies: `pip install -r requirements.txt`
+3. Run from workspace root: `python -m medium_publisher.main`
 
-### Browser won't launch
+### Keystrokes going to wrong window
 
-**Solutions**:
-1. Reinstall Playwright browser: `playwright install chromium --force`
-2. Check antivirus isn't blocking
-3. Verify disk space available
-4. Check logs for specific error
+1. Enable `safety.focus_check_enabled: true`
+2. Ensure the browser window is focused before typing starts
+3. Don't click other windows during typing
+4. Use emergency stop (`Ctrl+Shift+Escape`) if needed
 
-### Authentication fails
+### Screen recognition not detecting states
 
-**Solutions**:
-1. Verify credentials are correct
-2. Try logging in manually on Medium
-3. Check internet connection
-4. Clear session cookies and re-authenticate
-5. Try different authentication method
+1. Check `assets/medium/` has reference images
+2. Lower `navigation.screen_confidence` (try 0.7)
+3. Verify display scaling matches reference images
+4. Ensure browser is on primary monitor
+5. Recapture reference images if Medium's UI changed
 
-### Content not typing
+### Login detection timing out
 
-**Solutions**:
-1. Verify browser is visible (not headless)
-2. Check rate limiting isn't paused
-3. Verify selectors are correct
-4. Check logs for errors
-5. Update `selectors.yaml` if Medium UI changed
+1. Increase `navigation.login_timeout_seconds`
+2. Complete login faster in your browser
+3. Verify the logged-in reference image matches your screen
 
-### Settings not saving
+### Typing seems stuck
 
-**Solutions**:
-1. Check file permissions on `%USERPROFILE%\.medium_publisher\`
-2. Verify YAML syntax in config file
-3. Check logs for validation errors
-4. Delete and recreate config file
+1. Check if focus was lost (look for FocusLostError in logs)
+2. Check if emergency stop was accidentally triggered
+3. Verify the editor is ready (cursor blinking in Medium's editor)
+4. Check logs for NavigationError or InputControlError
 
-### Where are logs located?
+### Where are logs?
 
-`%USERPROFILE%\.medium_publisher\logs\`
-
-**Log Files**:
-- `medium_publisher.log`: Latest log
-- `medium_publisher_YYYYMMDD.log`: Daily logs
-
-### How do I enable debug logging?
-
-1. Edit `medium_publisher\utils\logger.py`
-2. Change `default_level="INFO"` to `default_level="DEBUG"`
-3. Restart application
-4. Reproduce issue
-5. Check logs for detailed information
-
-### How do I report a bug?
-
-1. Check FAQ and troubleshooting guide
-2. Collect diagnostic information:
-   - Error message
-   - Steps to reproduce
-   - Logs
-   - Screenshots
-3. Search existing issues
-4. Create new issue with details
-
-### Can I get help?
-
-Yes:
-1. Read documentation thoroughly
-2. Check FAQ and troubleshooting guide
-3. Search community forums
-4. Create issue with detailed information
-5. Provide logs and diagnostic data
+Check the application's log output. Log level can be adjusted in the logger configuration.
 
 ---
 
-**Still Have Questions?** Check the [User Guide](USER_GUIDE.md) for detailed information or [Troubleshooting Guide](TROUBLESHOOTING.md) for specific issues.
+**Still Have Questions?** See the [User Guide](USER_GUIDE_KEYBOARD_PUBLISHER.md) for detailed walkthroughs or [CONFIGURATION.md](CONFIGURATION.md) for all settings.

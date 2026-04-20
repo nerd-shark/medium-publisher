@@ -11,15 +11,15 @@
 
 ## Overview
 
-The Medium Article Publisher is a desktop application built with a layered architecture that separates concerns between UI, business logic, and browser automation. The application follows SOLID principles and uses dependency injection for testability.
+The Medium Article Publisher is a desktop application that types markdown articles into Medium's web editor using OS-level keyboard and mouse events. It uses screen recognition (image matching) to detect page state and navigate through login flows, then simulates human typing with realistic delays, typos, and corrections.
 
 ### Key Architectural Principles
 
-1. **Separation of Concerns**: UI, business logic, and automation are in separate layers
+1. **Separation of Concerns**: UI, business logic, automation, navigation, and safety are in separate layers
 2. **Dependency Injection**: Components receive dependencies rather than creating them
 3. **Single Responsibility**: Each class has one clear purpose
-4. **Interface Segregation**: Small, focused interfaces
-5. **Open/Closed**: Open for extension, closed for modification
+4. **OS-Level Input**: No browser automation libraries — all interaction happens through pyautogui/pynput
+5. **Screen Recognition over DOM**: Page state is detected by matching reference PNG images, not by querying the DOM
 
 ## System Architecture
 
@@ -29,34 +29,50 @@ The Medium Article Publisher is a desktop application built with a layered archi
 │  ┌────────────────────────────────────────────────────────┐ │
 │  │              PyQt6 UI Layer                            │ │
 │  │  - MainWindow (orchestration)                          │ │
+│  │  - FileSelector (article picker)                       │ │
 │  │  - SettingsDialog (configuration)                      │ │
 │  │  - ProgressWidget (feedback)                           │ │
-│  │  - LogDisplayWidget (transparency)                     │ │
+│  │  - LogWidget (transparency)                            │ │
 │  └────────────────────────────────────────────────────────┘ │
 │                           ↓                                  │
 │  ┌────────────────────────────────────────────────────────┐ │
-│  │           Application Logic Layer                      │ │
-│  │  - ArticleParser (markdown parsing)                    │ │
-│  │  - MarkdownProcessor (format conversion)               │ │
-│  │  - ChangeParser (version instructions)                 │ │
-│  │  - ConfigManager (settings)                            │ │
+│  │           Core Logic Layer                             │ │
+│  │  - ArticleParser (markdown + YAML frontmatter)         │ │
+│  │  - MarkdownProcessor (→ ContentBlock list)             │ │
+│  │  - PublishingWorkflow (QThread orchestrator)            │ │
+│  │  - ConfigManager (hierarchical YAML config)            │ │
 │  │  - SessionManager (state persistence)                  │ │
+│  │  - ChangeParser (version update instructions)          │ │
+│  │  - VersionDiffDetector (diff between versions)         │ │
 │  └────────────────────────────────────────────────────────┘ │
 │                           ↓                                  │
 │  ┌────────────────────────────────────────────────────────┐ │
-│  │         Browser Automation Layer                       │ │
-│  │  - PlaywrightController (browser lifecycle)            │ │
-│  │  - MediumEditor (editor interactions)                  │ │
-│  │  - AuthHandler (authentication)                        │ │
-│  │  - ContentTyper (typing with formatting)               │ │
-│  │  - RateLimiter (typing rate control)                   │ │
-│  │  - HumanTypingSimulator (realistic behavior)           │ │
+│  │         Automation Layer (OS-Level Input)              │ │
+│  │  - OSInputController (pyautogui keyboard/mouse)        │ │
+│  │  - HumanTypingSimulator (delays, typos, corrections)   │ │
+│  │  - ContentTyper (types blocks with formatting)         │ │
+│  │  - DeferredTypoTracker (records typos for review)      │ │
+│  │  - VersionUpdateTyper (applies version changes)        │ │
+│  └────────────────────────────────────────────────────────┘ │
+│                           ↓                                  │
+│  ┌────────────────────────────────────────────────────────┐ │
+│  │         Navigation Layer (Screen Recognition)          │ │
+│  │  - ScreenRecognition (pyautogui.locateOnScreen)        │ │
+│  │  - NavigationStateMachine (FSM for login flow)         │ │
+│  │  - LoginDetector (page state via reference images)     │ │
+│  └────────────────────────────────────────────────────────┘ │
+│                           ↓                                  │
+│  ┌────────────────────────────────────────────────────────┐ │
+│  │              Safety Layer                              │ │
+│  │  - EmergencyStop (hotkey + mouse corner failsafe)      │ │
+│  │  - FocusWindowDetector (pause when focus lost)         │ │
 │  └────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────┘
                            ↓
               ┌────────────────────────┐
-              │   Chromium Browser     │
-              │   (Playwright)         │
+              │   Default Browser      │
+              │   (opened via          │
+              │    webbrowser module)   │
               └────────────────────────┘
                            ↓
               ┌────────────────────────┐
@@ -70,223 +86,231 @@ The Medium Article Publisher is a desktop application built with a layered archi
 
 **Purpose**: User interaction and visual feedback
 
-**Components**:
-- `MainWindow`: Primary application window, orchestrates workflows
-- `SettingsDialog`: Configuration management UI
-- `ProgressWidget`: Real-time progress feedback
-- `LogDisplayWidget`: Operation transparency and debugging
+**Modules**:
+- `main_window.py` — Primary application window, workflow orchestration
+- `file_selector.py` — File picker for markdown articles
+- `settings_dialog.py` — Configuration management UI
+- `progress_widget.py` — Real-time progress feedback
+- `log_widget.py` — Operation log display
 
 **Responsibilities**:
-- Capture user input
-- Display application state
-- Provide visual feedback
-- Handle user events
-- Delegate to business logic layer
-
-**Design Pattern**: Model-View-Controller (MVC)
-- View: PyQt6 widgets
-- Controller: MainWindow event handlers
-- Model: Core layer classes
+- Capture user input (file selection, settings, start/stop)
+- Display application state and progress
+- Provide visual feedback during typing
+- Delegate to core layer via signals/slots
+- Keep responsive via QThread-based workflows
 
 ### 2. Core Logic Layer (`core/`)
 
-**Purpose**: Business logic and data processing
+**Purpose**: Business logic, data processing, and workflow orchestration
 
-**Components**:
-- `ArticleParser`: Parse markdown files and frontmatter
-- `MarkdownProcessor`: Convert markdown to Medium format
-- `ChangeParser`: Parse version update instructions
-- `ConfigManager`: Application configuration
-- `SessionManager`: State persistence
+**Modules**:
+- `article_parser.py` — Parses markdown files with YAML frontmatter into Article objects
+- `markdown_processor.py` — Converts parsed markdown into a list of ContentBlock objects (paragraphs, headers, code blocks, lists, etc.)
+- `publishing_workflow.py` — QThread-based orchestrator that coordinates the full pipeline: open browser → navigate → login → type content
+- `config_manager.py` — Hierarchical YAML configuration with defaults, user overrides, and environment variables
+- `session_manager.py` — Persists state between runs (last file, window position, etc.)
+- `change_parser.py` — Parses version update instructions (what to add/remove/modify)
+- `version_diff_detector.py` — Detects differences between article versions
 
 **Responsibilities**:
-- Parse and validate input
-- Transform data
-- Manage application state
-- Enforce business rules
-- No UI or browser dependencies
-
-**Design Pattern**: Service Layer
-- Services operate independently
-- Can be tested without UI or browser
-- Reusable across different interfaces
+- Parse and validate markdown input
+- Transform markdown into typed content blocks
+- Orchestrate the full publishing pipeline
+- Manage application configuration
+- No direct UI or OS input dependencies (testable in isolation)
 
 ### 3. Automation Layer (`automation/`)
 
-**Purpose**: Browser control and Medium interaction
+**Purpose**: OS-level keyboard and mouse control with human-like behavior
 
-**Components**:
-- `PlaywrightController`: Browser lifecycle management
-- `MediumEditor`: Medium-specific editor interactions
-- `AuthHandler`: Authentication workflows
-- `ContentTyper`: Content typing with formatting
-- `RateLimiter`: Typing rate enforcement
-- `HumanTypingSimulator`: Realistic typing behavior
-
-**Responsibilities**:
-- Control browser
-- Interact with Medium UI
-- Simulate human behavior
-- Handle authentication
-- Enforce rate limits
-
-**Design Pattern**: Facade + Strategy
-- Facade: MediumEditor provides simple interface
-- Strategy: Different typing strategies (human vs fast)
-
-### 4. Utility Layer (`utils/`)
-
-**Purpose**: Cross-cutting concerns
-
-**Components**:
-- `logger.py`: Logging configuration
-- `validators.py`: Input validation
-- `exceptions.py`: Custom exceptions
+**Modules**:
+- `os_input_controller.py` — Wraps pyautogui for keyboard/mouse operations (keypress, hotkey, click, type)
+- `human_typing_simulator.py` — Generates realistic typing delays, introduces typos, and simulates corrections (backspace + retype)
+- `content_typer.py` — Types ContentBlock objects with appropriate formatting (headers via Ctrl+Alt+1, bold via Ctrl+B, etc.)
+- `deferred_typo_tracker.py` — Records typos that weren't fixed inline, for a review pass after typing completes
+- `version_update_typer.py` — Applies version changes to an existing draft (find section, select, delete, retype)
 
 **Responsibilities**:
-- Logging
-- Validation
-- Error handling
-- Common utilities
+- Send OS-level keyboard events (character-by-character)
+- Send OS-level mouse clicks (for navigation buttons)
+- Simulate human typing patterns (variable delays, occasional typos)
+- Apply Medium-specific keyboard shortcuts for formatting
+- Track and fix deferred typos in a review pass
+
+**Key Design Decision**: All input goes through pyautogui/pynput, not through any browser API. This means the app types into whatever window has focus — the safety layer ensures that's the correct window.
+
+### 4. Navigation Layer (`navigation/`)
+
+**Purpose**: Detect page state and navigate through login flows using screen recognition
+
+**Modules**:
+- `screen_recognition.py` — Wraps `pyautogui.locateOnScreen()` to find reference PNG images on screen with configurable confidence threshold
+- `navigation_state_machine.py` — Finite state machine that drives the login flow (detect state → click appropriate button → wait → detect next state)
+- `login_detector.py` — Determines current page state (Medium homepage, Google OAuth page, editor, etc.) by matching reference images
+
+**Responsibilities**:
+- Open Medium.com via `webbrowser.open()`
+- Detect current page state by matching reference screenshots
+- Navigate through Google OAuth login by clicking detected UI elements
+- Transition through states until the editor is reached
+- Handle timeouts and retry logic
+
+**Reference Images**: Stored in `assets/medium/` as PNG files. Each image represents a UI element or page state (e.g., "Sign in with Google" button, account selector, editor toolbar).
+
+### 5. Safety Layer (`safety/`)
+
+**Purpose**: Protect against runaway automation
+
+**Modules**:
+- `emergency_stop.py` — Global hotkey listener (Ctrl+Shift+Escape) and mouse-to-corner failsafe. Immediately halts all automation and releases held modifier keys.
+- `focus_window_detector.py` — Monitors which window has focus. Pauses typing if the browser loses focus, resumes when focus returns.
+
+**Responsibilities**:
+- Provide multiple independent stop mechanisms
+- Release all held modifier keys on emergency stop
+- Pause automation when target window loses focus
+- Prevent typing into wrong applications
 
 ## Data Flow
 
 ### Publishing Flow
 
 ```
-1. User selects markdown file
+1. User selects markdown file in UI
    ↓
 2. ArticleParser.parse_file()
-   - Extract frontmatter (title, tags, subtitle)
+   - Extract YAML frontmatter (title, subtitle, tags)
    - Extract body content
    - Return Article object
    ↓
 3. MarkdownProcessor.process()
    - Parse markdown syntax
-   - Convert to ContentBlock list
-   - Detect tables/images → placeholders
+   - Convert to list of ContentBlock objects
+   - Each block has: type, content, formatting metadata
+   - Tables/images → placeholder blocks
    ↓
-4. AuthHandler.login() or restore_session()
-   - Check existing session
-   - Perform OAuth or email/password login
-   - Save session cookies
+4. PublishingWorkflow.run() [in QThread]
    ↓
-5. MediumEditor.create_new_story() or navigate_to_draft()
-   - Navigate to editor
-   - Clear existing content (if draft URL)
+5. webbrowser.open("https://medium.com/new-story")
+   - Opens default browser
    ↓
-6. ContentTyper.type_text()
-   - RateLimiter.wait_if_needed()
-   - HumanTypingSimulator.should_make_typo()
-   - Type character by character
-   - Apply formatting (bold, italic, headers)
+6. NavigationStateMachine.navigate_to_editor()
+   - ScreenRecognition detects page state
+   - LoginDetector identifies: homepage? OAuth page? editor?
+   - Clicks through login flow using detected button positions
+   - Waits for each transition (with timeout)
    ↓
-7. MediumEditor.add_tags() and add_subtitle()
+7. ContentTyper.type_blocks(content_blocks)
+   - For each ContentBlock:
+     a. Apply formatting prefix (header shortcut, quote shortcut, etc.)
+     b. OSInputController types text character-by-character
+     c. HumanTypingSimulator adds delays and occasional typos
+     d. DeferredTypoTracker records unfixed typos
    ↓
-8. User reviews and publishes
+8. DeferredTypoTracker.fix_deferred_typos()
+   - Review pass: navigate to each deferred typo and fix it
+   ↓
+9. UI shows completion notification
+   - Lists any placeholders (images, tables) for manual insertion
 ```
 
 ### Version Update Flow
 
 ```
-1. User selects version (v2, v3, etc.)
+1. User selects new version file
    ↓
-2. User enters change instructions
-   ↓
-3. ChangeParser.parse_instructions()
+2. ChangeParser.parse_instructions()
    - Identify sections to modify
-   - Extract search markers
+   - Extract search markers and replacement content
    ↓
-4. ArticleParser.parse_file() for new version
+3. VersionDiffDetector.detect_changes()
+   - Compare old version to new version
+   - Produce list of change operations
    ↓
-5. MarkdownProcessor.compare_versions()
-   - Identify changed sections
+4. VersionUpdateTyper.apply_changes()
+   - For each change:
+     a. Use Ctrl+F to find section marker
+     b. Select the section content
+     c. Delete selected content
+     d. Type new content via ContentTyper
    ↓
-6. For each change:
-   a. MediumEditor.find_section()
-   b. MediumEditor.select_section()
-   c. MediumEditor.delete_selected_content()
-   d. ContentTyper.type_text() (new content)
-   ↓
-7. User reviews changes
+5. User reviews changes in Medium
 ```
 
 ## Design Patterns
 
-### 1. Dependency Injection
+### 1. State Machine (Navigation)
 
-**Purpose**: Testability and flexibility
+**Purpose**: Manage complex login flow with clear state transitions
 
-**Example**:
 ```python
-class MediumEditor:
-    def __init__(self, controller: PlaywrightController, 
-                 typer: ContentTyper, config: dict):
-        self.controller = controller
-        self.typer = typer
-        self.config = config
+class NavigationStateMachine:
+    states = [INITIAL, MEDIUM_HOME, SIGN_IN_PAGE, GOOGLE_OAUTH, 
+              ACCOUNT_SELECTOR, TWO_FACTOR, EDITOR_READY]
+    
+    def advance(self):
+        current = self.detect_state()  # Screen recognition
+        action = self.transitions[current]
+        action.execute()  # Click detected button
+        self.wait_for_transition()
 ```
 
-**Benefits**:
-- Easy to mock dependencies in tests
-- Can swap implementations
-- Clear dependencies
+### 2. Strategy Pattern (Typing Behavior)
 
-### 2. Strategy Pattern
+**Purpose**: Swap between human-like and fast typing
 
-**Purpose**: Interchangeable algorithms
-
-**Example**: Human typing vs fast typing
 ```python
 class HumanTypingSimulator:
-    def get_typing_delay(self, base_delay: int) -> int:
-        # Add variation
+    def get_delay(self, base_delay: int) -> int:
+        # Gaussian variation + occasional long pauses
         
-class FastTypingSimulator:
-    def get_typing_delay(self, base_delay: int) -> int:
-        # No variation
+    def should_make_typo(self) -> bool:
+        # Probabilistic typo generation
+        
+    def get_typo_char(self, intended: str) -> str:
+        # Adjacent key on keyboard layout
 ```
 
-### 3. Facade Pattern
+### 3. Observer Pattern (Progress Updates)
 
-**Purpose**: Simplify complex subsystems
+**Purpose**: Keep UI responsive during long typing operations
 
-**Example**: MediumEditor hides Playwright complexity
 ```python
-class MediumEditor:
-    async def type_content(self, blocks: List[ContentBlock]):
-        # Hides complex Playwright interactions
-        # Orchestrates ContentTyper, RateLimiter, etc.
-```
-
-### 4. Observer Pattern
-
-**Purpose**: Event notification
-
-**Example**: Progress updates
-```python
-class PublishingWorkflow:
-    def __init__(self, progress_callback):
-        self.progress_callback = progress_callback
-        
-    async def publish(self):
-        self.progress_callback("Typing title...")
+class PublishingWorkflow(QThread):
+    progress_updated = pyqtSignal(int, str)  # percent, message
+    typing_complete = pyqtSignal()
+    error_occurred = pyqtSignal(str)
+    
+    def run(self):
+        self.progress_updated.emit(10, "Opening browser...")
         # ...
-        self.progress_callback("Typing content...")
+        self.progress_updated.emit(50, "Typing content...")
 ```
 
-### 5. Template Method Pattern
+### 4. Facade Pattern (OS Input)
 
-**Purpose**: Define algorithm skeleton
+**Purpose**: Simplify pyautogui/pynput interactions behind a clean interface
 
-**Example**: Authentication flow
 ```python
-class AuthHandler:
-    async def login(self):
-        # Template method
-        await self._navigate_to_login()
-        await self._perform_authentication()
-        await self._save_session()
+class OSInputController:
+    def type_character(self, char: str): ...
+    def hotkey(self, *keys): ...
+    def click_at(self, x: int, y: int): ...
+    def release_all_modifiers(self): ...
+```
+
+### 5. Template Method (Content Typing)
+
+**Purpose**: Different block types share the same typing skeleton but vary in formatting
+
+```python
+class ContentTyper:
+    def type_block(self, block: ContentBlock):
+        self._apply_prefix_formatting(block)  # Header shortcut, quote, etc.
+        self._type_content(block)              # Character-by-character
+        self._apply_inline_formatting(block)   # Bold, italic, links
+        self._finalize_block(block)            # Enter key, separator
 ```
 
 ## Technology Stack
@@ -297,38 +321,38 @@ class AuthHandler:
 |-----------|-----------|---------|
 | Language | Python 3.11+ | Application logic |
 | UI Framework | PyQt6 | Desktop interface |
-| Browser Automation | Playwright | Browser control |
-| Markdown Parsing | markdown2 | Markdown to HTML |
-| Configuration | PyYAML | Config files |
-| Credentials | keyring | Secure storage |
-| Testing | pytest | Unit/integration tests |
+| Keyboard/Mouse | pyautogui + pynput | OS-level input events |
+| Screen Recognition | pyautogui.locateOnScreen() + Pillow | Detect page state via image matching |
+| Browser Opening | webbrowser (stdlib) | Open Medium in default browser |
+| Markdown Parsing | markdown2 | Markdown to structured content |
+| Configuration | PyYAML | Hierarchical config files |
+| Credentials | keyring | Secure OS credential storage |
+| Encryption | pycryptodome | Session data encryption |
+| Windows API | pywin32 | Window focus detection |
+| Environment | python-dotenv | Environment variable loading |
 
-### Key Libraries
+### Dependencies (requirements.txt)
 
-```python
-# UI
-PyQt6==6.6.0
-PyQt6-Qt6==6.6.0
-
-# Browser Automation
-playwright==1.40.0
-
-# Markdown Processing
-markdown2==2.4.10
-
-# Configuration
-PyYAML==6.0.1
-python-dotenv==1.0.0
-
-# Security
-keyring==24.3.0
-
-# Testing
-pytest==7.4.3
-pytest-asyncio==0.21.1
-pytest-qt==4.2.0
-pytest-cov==4.1.0
 ```
+PyQt6
+pyautogui
+pynput
+Pillow
+pywin32
+pycryptodome
+markdown2
+PyYAML
+python-dotenv
+keyring
+```
+
+### What's NOT in the Stack
+
+- ❌ Playwright — No browser automation library
+- ❌ Selenium — No WebDriver
+- ❌ Chromium — No bundled browser
+- ❌ async/await — Synchronous code with QThread for concurrency
+- ❌ Any DOM manipulation — All interaction is OS-level
 
 ## Module Dependencies
 
@@ -336,58 +360,72 @@ pytest-cov==4.1.0
 
 ```
 ui/
-├── depends on → core/
-├── depends on → automation/
-└── depends on → utils/
+├── depends on → core/ (workflow, config, parser)
+└── depends on → safety/ (emergency stop binding)
 
 core/
-├── depends on → utils/
-└── no dependencies on ui/ or automation/
+├── depends on → automation/ (content typer, OS input)
+├── depends on → navigation/ (state machine, screen recognition)
+└── depends on → safety/ (focus detection, emergency stop)
 
 automation/
-├── depends on → core/ (for data models)
-├── depends on → utils/
-└── no dependencies on ui/
+├── depends on → safety/ (checks before typing)
+└── no dependencies on ui/ or navigation/
 
-utils/
-└── no dependencies (leaf modules)
+navigation/
+├── depends on → automation/ (OS input for clicking)
+└── no dependencies on ui/ or core/
+
+safety/
+└── no dependencies (leaf layer — standalone monitors)
 ```
 
 ### Import Rules
 
-1. **UI can import**: core, automation, utils
-2. **Core can import**: utils only
-3. **Automation can import**: core, utils
-4. **Utils imports**: nothing (leaf modules)
+1. **UI** can import: core, safety
+2. **Core** can import: automation, navigation, safety
+3. **Automation** can import: safety
+4. **Navigation** can import: automation
+5. **Safety** imports: nothing (leaf layer, standalone)
 
 ### Circular Dependency Prevention
 
-- Core layer is independent of UI and automation
-- Data models in core/ are shared
-- No circular imports between layers
+- Safety layer is fully independent (can halt anything without importing it)
+- Navigation uses automation for clicking but doesn't know about content
+- Core orchestrates everything but automation/navigation don't depend on core
 
 ## Configuration Architecture
 
-### Configuration Hierarchy
+### Configuration Hierarchy (highest priority wins)
 
 ```
-1. Default values (code)
+1. Code defaults (lowest)
    ↓
-2. default_config.yaml (shipped)
+2. default_config.yaml (medium_publisher/config/)
    ↓
-3. User config file (user's home)
+3. User config (~/.medium_publisher/config.yaml)
    ↓
 4. Environment variables (highest priority)
 ```
 
-### Configuration Files
+### Configuration Sections
+
+| Section | Contents |
+|---------|----------|
+| `typing` | Base delay, variation, typo frequency, deferred ratio |
+| `publishing` | Default mode, batch settings |
+| `safety` | Emergency hotkey, countdown, failsafe settings |
+| `navigation` | Google email, confidence threshold, timeouts |
+| `ui` | Always on top, remember position, theme |
+| `assets` | Reference image paths |
+
+### Key Files
 
 | File | Location | Purpose |
 |------|----------|---------|
-| `default_config.yaml` | `config/` | Default settings |
-| `selectors.yaml` | `config/` | CSS selectors |
-| `user_config.yaml` | `~/.medium_publisher/` | User overrides |
-| `.env` | Project root | Environment vars |
+| `default_config.yaml` | `medium_publisher/config/` | Shipped defaults |
+| `config.yaml` | `~/.medium_publisher/` | User overrides |
+| `*.png` | `medium_publisher/assets/medium/` | Screen recognition reference images |
 
 ## Error Handling Architecture
 
@@ -395,75 +433,67 @@ utils/
 
 ```
 PublishingError (base)
-├── AuthenticationError
-│   ├── InvalidCredentialsError
-│   ├── OAuthTimeoutError
-│   └── SessionExpiredError
-├── BrowserError
-│   ├── SelectorNotFoundError
-│   ├── PageLoadTimeoutError
-│   └── BrowserCrashError
+├── NavigationError
+│   ├── ScreenRecognitionTimeout
+│   ├── LoginFlowFailed
+│   └── UnexpectedPageState
+├── TypingError
+│   ├── FocusLostError
+│   ├── EmergencyStopTriggered
+│   └── FormattingError
 ├── ContentError
 │   ├── InvalidMarkdownError
 │   ├── MissingFrontmatterError
 │   └── UnsupportedFormatError
-└── FileError
-    ├── FileNotFoundError
-    ├── InvalidPathError
-    └── PermissionError
+└── ConfigError
+    ├── MissingConfigError
+    └── InvalidConfigError
 ```
 
 ### Error Handling Strategy
 
-1. **Catch specific exceptions**: Handle known errors
-2. **Retry logic**: Up to 3 attempts for transient errors
-3. **User feedback**: Clear error messages
-4. **Logging**: Detailed logs for debugging
-5. **Graceful degradation**: Continue when possible
+1. **Emergency stop**: Immediately halt, release all keys, save progress
+2. **Focus lost**: Pause and wait for focus to return
+3. **Screen recognition timeout**: Retry with lower confidence, then prompt user
+4. **Typing errors**: Log and continue (typos are self-correcting by design)
+5. **User feedback**: Clear error messages in the log widget
 
 ## Performance Considerations
 
-### Rate Limiting
+### Typing Speed
 
-- **Hard limit**: 35 characters per minute
-- **Implementation**: Sliding window algorithm
-- **Enforcement**: RateLimiter class
-- **Overhead**: Typo simulation adds 20-30% time
+- **Base rate**: ~60 WPM (200ms between keystrokes)
+- **Variation**: ±30% Gaussian distribution around base delay
+- **Typo overhead**: ~20-30% additional time for typo/correction cycles
+- **Formatting overhead**: Keyboard shortcuts add ~100ms per formatted span
 
-### Memory Management
+### Threading Model
 
-- **Stream large files**: Don't load entirely in memory
-- **Clear after use**: Delete ContentBlock objects after typing
-- **Browser reuse**: Single browser instance per session
-- **Log rotation**: Limit log file size to 10MB
+- **Main thread**: PyQt6 event loop (UI responsive at all times)
+- **Worker thread**: QThread runs PublishingWorkflow (typing, navigation)
+- **Communication**: pyqtSignal/pyqtSlot for thread-safe UI updates
+- **No async/await**: Synchronous code in worker thread, sleeps for delays
 
-### Async/Await
+### Memory
 
-- **Browser operations**: All async for non-blocking
-- **UI updates**: Qt signals for thread safety
-- **Concurrent operations**: Where possible (file I/O)
+- ContentBlock list is generated once and consumed sequentially
+- Reference images loaded on demand for screen recognition
+- Log rotation at 10MB prevents unbounded growth
 
 ## Security Architecture
 
 ### Credential Storage
 
-- **OS keychain**: Use `keyring` library
-- **Session cookies**: Encrypted storage
-- **No plaintext**: Never store passwords in plaintext
-- **Clear on logout**: Remove credentials when user logs out
+- **OS keychain**: `keyring` library for stored credentials
+- **Session data**: Encrypted with pycryptodome
+- **No plaintext passwords**: Ever
 
-### Input Validation
+### Input Safety
 
-- **File paths**: Validate and sanitize
-- **Markdown content**: Escape special characters
-- **URLs**: Validate format and domain
-- **User input**: Sanitize before use
-
-### Browser Security
-
-- **Isolated context**: Each session in separate browser context
-- **No persistent storage**: Clear cookies on exit (unless "Remember Me")
-- **HTTPS only**: All Medium communication over HTTPS
+- **Focus detection**: Only types when correct window is focused
+- **Emergency stop**: Multiple independent halt mechanisms
+- **Key release**: All modifier keys released on stop/error/exit
+- **No network access**: App doesn't make HTTP requests (browser handles all Medium communication)
 
 ## Testing Architecture
 
@@ -475,74 +505,27 @@ tests/
 │   ├── test_article_parser.py
 │   ├── test_markdown_processor.py
 │   ├── test_change_parser.py
-│   ├── test_rate_limiter.py
-│   └── test_human_typing_simulator.py
+│   ├── test_human_typing_simulator.py
+│   ├── test_config_manager.py
+│   └── test_version_diff_detector.py
 ├── integration/
-│   ├── test_playwright_controller.py
-│   ├── test_auth_handler.py
-│   ├── test_medium_editor.py
-│   └── test_end_to_end.py
+│   ├── test_content_typer.py
+│   ├── test_navigation_state_machine.py
+│   └── test_publishing_workflow.py
 └── ui/
     ├── test_main_window.py
     └── test_settings_dialog.py
 ```
 
-### Test Coverage Goals
-
-- **Unit tests**: 80% code coverage minimum
-- **Integration tests**: Critical paths covered
-- **UI tests**: Button states and workflows
-- **End-to-end**: Full publishing flow
-
 ### Mocking Strategy
 
-- **Browser**: Mock Playwright for unit tests
+- **OS input**: Mock pyautogui/pynput for unit tests (no actual keypresses)
+- **Screen recognition**: Mock locateOnScreen with predetermined results
 - **File system**: Use temporary directories
-- **Network**: Mock HTTP requests
-- **Time**: Mock time.sleep() for speed
-
-## Deployment Architecture
-
-### Packaging
-
-- **Tool**: PyInstaller
-- **Output**: Single executable
-- **Includes**: Python runtime, dependencies, Playwright browsers
-- **Platform**: Windows 10/11
-
-### Installation
-
-- **Installer**: Windows .msi or .exe
-- **Location**: Program Files
-- **Shortcuts**: Desktop and Start Menu
-- **Uninstaller**: Standard Windows uninstall
-
-### Updates
-
-- **Check on startup**: Query for new version
-- **Download**: Automatic download
-- **Install**: User-initiated installation
-- **Preserve**: User configuration and sessions
-
-## Future Architecture Considerations
-
-### Extensibility Points
-
-1. **Platform abstraction**: Support other platforms (LinkedIn, Dev.to)
-2. **Plugin system**: Custom markdown processors
-3. **Template system**: Reusable article templates
-4. **Scheduling**: Queue and schedule publications
-5. **Analytics**: Track published articles and stats
-
-### Scalability
-
-- **Batch processing**: Parallel article processing
-- **Cloud deployment**: Web-based version
-- **API**: RESTful API for programmatic access
-- **Database**: Store article history and metadata
+- **Time**: Mock sleep() for fast test execution
 
 ---
 
-**Document Version**: 1.0
-**Last Updated**: 2025-03-01
+**Document Version**: 2.0
+**Last Updated**: 2025-06-01
 **Maintained By**: Development Team

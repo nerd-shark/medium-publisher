@@ -15,16 +15,19 @@
 
 ### Software Requirements
 - **Python**: 3.11 or higher
-- **Internet Connection**: Required for Medium access and browser automation
-- **Disk Space**: ~500 MB (includes Python packages and Chromium browser)
+- **Internet Connection**: Required for Medium access
+- **A web browser**: Chrome, Edge, or Firefox (your default browser is used)
+- **Disk Space**: ~200 MB (Python packages only — no bundled browser)
 - **RAM**: Minimum 4 GB (8 GB recommended)
+- **Display**: Consistent scaling (100% or 150%) for screen recognition
 
 ### Medium Account
 - Active Medium account
-- Google account (if using Google OAuth)
-- Email/password credentials (if using traditional login)
+- Google account linked to Medium (Google OAuth is the supported login flow)
 
 ## Installation
+
+All commands run from the **workspace root** — the folder that *contains* `medium_publisher/`.
 
 ### Step 1: Install Python
 
@@ -39,14 +42,14 @@
 
 ### Step 2: Download Application
 
-1. Download the application source code
-2. Extract to a directory (e.g., `C:\medium_publisher\`)
-3. Open Command Prompt in that directory
+1. Download or clone the application source code
+2. Extract to a directory (e.g., `C:\projects\medium-workspace\`)
+3. Open Command Prompt in that directory (the workspace root)
 
 ### Step 3: Create Virtual Environment
 
 ```cmd
-REM Create virtual environment
+REM Create virtual environment (from workspace root)
 python -m venv venv
 
 REM Activate virtual environment
@@ -57,87 +60,87 @@ REM Verify activation (prompt should show (venv))
 
 ### Step 4: Install Dependencies
 
-**Important**: If you're in a corporate environment with AWS CodeArtifact or custom pip index, you may need to use the public PyPI index.
+**Important**: The requirements file is inside the `medium_publisher/` subdirectory.
 
 **Option A: Standard Installation (Public PyPI)**
 
 ```cmd
-REM Install from public PyPI (recommended)
-pip install -r requirements.txt --index-url https://pypi.org/simple/
+pip install -r medium_publisher\requirements.txt --index-url https://pypi.org/simple/
 ```
 
 **Option B: Corporate Environment with CodeArtifact**
 
-If you need both CodeArtifact and public PyPI:
-
 ```cmd
-REM Use public PyPI as primary, CodeArtifact as fallback
-pip install -r requirements.txt --index-url https://pypi.org/simple/ --extra-index-url https://your-codeartifact-url/simple/
+pip install -r medium_publisher\requirements.txt --index-url https://pypi.org/simple/ --extra-index-url https://your-codeartifact-url/simple/
 ```
 
 **Option C: Default pip Configuration**
 
-If your pip is already configured correctly:
-
 ```cmd
-REM Install with default configuration
-pip install -r requirements.txt
+pip install -r medium_publisher\requirements.txt
 ```
 
 **Packages Installed**:
-- PyQt6 (desktop UI)
-- playwright (browser automation)
-- PyYAML (configuration)
-- keyring (credential storage)
-- pytest (testing framework)
-- And other dependencies
+- PyQt6 — Desktop UI framework
+- pyautogui — OS-level mouse/keyboard control
+- pynput — Keyboard/mouse event listening (hotkeys, focus detection)
+- Pillow — Image processing for screen recognition
+- pywin32 — Windows API access (window management)
+- pycryptodome — Encryption utilities
+- markdown2 — Markdown parsing
+- PyYAML — Configuration files
+- python-dotenv — Environment variable loading
+- keyring — Secure credential storage
 
-### Step 5: Install Playwright Browsers
+**That's it.** No browser installation step. The app uses your existing default browser via the `webbrowser` module.
 
-```cmd
-REM Install Chromium browser for automation
-playwright install chromium
-
-REM This downloads ~150 MB
-```
-
-### Step 6: Verify Installation
+### Step 5: Verify Installation
 
 ```cmd
-REM Run application
-python main.py
-
-REM Application window should appear
+REM Launch the application (from workspace root)
+python -m medium_publisher.main
 ```
+
+The PyQt6 application window should appear. If it does, you're good to go.
 
 ## First-Time Setup
 
 ### Step 1: Configure Settings
 
-1. Launch the application: `python main.py`
+1. Launch the application: `python -m medium_publisher.main`
 2. Click the **Settings** button (⚙️ icon)
 3. Configure your preferences:
 
 **Typing Settings**:
-- Typing Speed: 30ms (default, adjust if needed)
-- Human-like Typing: Enabled (recommended)
-- Typo Frequency: Low or Medium
+- Base Delay: 200ms (default, ~60 WPM)
+- Speed Variation: ±30%
+- Typo Frequency: Low (2%)
+- Immediate/Deferred Ratio: 70/30
 
-**Publishing Settings**:
-- Default Mode: Draft (recommended for first use)
+**Safety Settings**:
+- Emergency Stop Hotkey: Ctrl+Shift+Escape
+- Mouse Corner Failsafe: Enabled
+- Countdown Duration: 3 seconds
 
-**Browser Settings**:
-- Browser Visibility: Visible (recommended for first use)
+**Navigation Settings**:
+- Google Account Email: Your Google email for OAuth
+- Screen Confidence Threshold: 0.8
 
-**Paths Settings**:
-- Default Article Directory: Select your articles folder
-
-**Credentials Settings**:
-- Remember Login: Enabled (for convenience)
+**UI Settings**:
+- Always on Top: Yes
+- Remember Window Position: Yes
 
 4. Click **Save**
 
-### Step 2: Prepare Test Article
+### Step 2: Verify Display Scaling
+
+Screen recognition relies on reference PNG images matching what's on screen. If your display scaling doesn't match the reference images:
+
+1. Check your Windows display scaling (Settings → Display → Scale)
+2. The reference images were captured at a specific scaling (typically 100% or 150%)
+3. If recognition fails, you can recapture reference images from Settings
+
+### Step 3: Prepare Test Article
 
 Create a test markdown file (`test-article.md`):
 
@@ -156,71 +159,33 @@ This is a test article to verify the Medium Article Publisher is working correct
 
 ## Section 1
 
-Some test content here.
+Some test content here with **bold** and *italic* text.
 
 ## Conclusion
 
 If you can see this article in Medium, the publisher is working!
 ```
 
-### Step 3: Authenticate with Medium
+### Step 4: Test the Full Flow
 
-**Option A: Google OAuth (Recommended)**
-
-1. Click **"Login"** button
-2. Select **"Google OAuth"** from dropdown
-3. Browser window opens to Medium login page
-4. Click **"Sign in with Google"** in the browser
-5. Complete Google authentication
-6. Application detects successful login
-7. Status shows: "Logged in successfully"
-
-**Option B: Email/Password**
-
-1. Click **"Login"** button
-2. Select **"Email/Password"** from dropdown
-3. Enter your Medium email and password
-4. Click **"Login"**
-5. If 2FA is enabled, complete it in the browser
-6. Status shows: "Logged in successfully"
-
-### Step 4: Publish Test Article
-
-1. Click **"Select File"** button
-2. Navigate to `test-article.md`
-3. Select the file
-4. Review the estimated time (should be ~5-10 minutes for short article)
-5. Click **"Publish Version"** button
-6. Confirm the operation
-7. Watch the progress bar
-8. When complete, review the article in Medium
-9. Verify content is correct
-10. Publish or delete the test article in Medium
+1. Click **"Select File"** and pick your test markdown
+2. Review the article info (title, character count, estimated time)
+3. Click **"Start Typing"**
+4. The app opens Medium.com in your default browser
+5. Screen recognition detects the page state and navigates through login
+6. Once in the editor, content is typed character-by-character
+7. After completion, review the article in Medium
 
 ## Verification
 
-### Verify Installation
-
-Run the verification script:
+### Verify All Dependencies
 
 ```cmd
-REM Activate virtual environment
 venv\Scripts\activate
-
-REM Run verification
-python -c "import PyQt6; import playwright; import yaml; import keyring; print('All dependencies installed successfully!')"
+python -c "import PyQt6; import pyautogui; import pynput; import PIL; import markdown2; import yaml; import keyring; print('All dependencies installed successfully!')"
 ```
 
 Expected output: `All dependencies installed successfully!`
-
-### Verify Browser
-
-```cmd
-REM Check Playwright browsers
-playwright --version
-
-REM Should show version number
-```
 
 ### Verify Configuration
 
@@ -231,7 +196,14 @@ dir medium_publisher\config\
 
 REM Should show:
 REM - default_config.yaml
-REM - selectors.yaml
+```
+
+### Verify Reference Images
+
+```cmd
+dir medium_publisher\assets\medium\
+
+REM Should show PNG files used for screen recognition
 ```
 
 ### Verify Logs
@@ -257,59 +229,36 @@ REM Should show log files
    - Add Python installation directory to PATH
    - Restart Command Prompt
 
+### ModuleNotFoundError: No module named 'medium_publisher'
+
+**Error**: Running `python -m medium_publisher.main` gives ModuleNotFoundError
+
+**Solution**: You're running from the wrong directory. You must be in the workspace root (the folder that *contains* `medium_publisher/`), not inside it.
+
+```cmd
+REM Wrong — inside the package
+cd medium_publisher
+python -m medium_publisher.main  ← FAILS
+
+REM Correct — at workspace root
+cd ..
+python -m medium_publisher.main  ← WORKS
+```
+
 ### Pip Install Fails
 
 **Error**: `pip install` fails with permission error
 
 **Solution**:
 ```cmd
-REM Run as administrator or use --user flag
-pip install --user -r requirements.txt --index-url https://pypi.org/simple/
+pip install --user -r medium_publisher\requirements.txt --index-url https://pypi.org/simple/
 ```
 
-**Error**: `401 Error, Credentials not correct` or `Could not find a version that satisfies the requirement`
+**Error**: `401 Error` or `Could not find a version that satisfies the requirement`
 
-**Solution**: Your pip is configured to use AWS CodeArtifact or a custom index that doesn't have all packages.
-
+**Solution**: Your pip is configured to use a custom index that doesn't have all packages.
 ```cmd
-REM Use public PyPI index
-pip install -r requirements.txt --index-url https://pypi.org/simple/
-```
-
-**Error**: `WARNING: Retrying` or connection timeout
-
-**Solution**: Network or firewall issue
-```cmd
-REM Use corporate proxy if required
-set HTTP_PROXY=http://proxy:port
-set HTTPS_PROXY=http://proxy:port
-pip install -r requirements.txt --index-url https://pypi.org/simple/
-```
-
-### Playwright Install Fails
-
-**Error**: `playwright install` fails
-
-**Solution**:
-```cmd
-REM Try with specific browser
-playwright install chromium --force
-
-REM Or install system dependencies
-playwright install-deps chromium
-```
-
-### Virtual Environment Issues
-
-**Error**: Cannot activate virtual environment
-
-**Solution**:
-```cmd
-REM Delete and recreate
-rmdir /s /q venv
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
+pip install -r medium_publisher\requirements.txt --index-url https://pypi.org/simple/
 ```
 
 ### PyQt6 Import Error
@@ -318,10 +267,29 @@ pip install -r requirements.txt
 
 **Solution**:
 ```cmd
-REM Reinstall PyQt6
-pip uninstall PyQt6
+pip uninstall PyQt6 PyQt6-Qt6 PyQt6-sip
 pip install PyQt6
 ```
+
+### pyautogui Fails to Import
+
+**Error**: `ImportError: No module named 'pyautogui'` or Pillow-related errors
+
+**Solution**:
+```cmd
+pip uninstall pyautogui Pillow
+pip install Pillow pyautogui
+```
+
+### Screen Recognition Not Working
+
+**Symptoms**: App can't detect Medium's login page or editor state
+
+**Solutions**:
+1. Check display scaling matches reference images
+2. Lower confidence threshold in Settings (try 0.7)
+3. Recapture reference images at your current resolution/scaling
+4. Ensure your browser isn't in dark mode if references were captured in light mode
 
 ### Keyring Access Error
 
@@ -329,30 +297,19 @@ pip install PyQt6
 
 **Solution**:
 - Windows Credential Manager should work automatically
-- If not, credentials will be prompted each time (no storage)
-- This is a fallback behavior and doesn't prevent usage
+- If not, credentials will be prompted each time
+- This doesn't prevent the app from working
 
-### Configuration File Not Found
+### Virtual Environment Issues
 
-**Error**: `FileNotFoundError: default_config.yaml`
-
-**Solution**:
-```cmd
-REM Verify you're in the correct directory
-cd medium_publisher
-dir config\
-
-REM If files missing, re-extract application
-```
-
-### Browser Launch Fails
-
-**Error**: `playwright._impl._api_types.Error: Executable doesn't exist`
+**Error**: Cannot activate virtual environment
 
 **Solution**:
 ```cmd
-REM Reinstall Chromium
-playwright install chromium --force
+rmdir /s /q venv
+python -m venv venv
+venv\Scripts\activate
+pip install -r medium_publisher\requirements.txt
 ```
 
 ### Permission Denied Errors
@@ -363,72 +320,42 @@ playwright install chromium --force
 1. Run Command Prompt as Administrator
 2. Or install to user directory:
    ```cmd
-   pip install --user -r requirements.txt
-   ```
-
-### Network/Firewall Issues
-
-**Error**: Connection timeout during installation
-
-**Solution**:
-1. Check firewall settings
-2. Allow Python and pip through firewall
-3. Use corporate proxy if required:
-   ```cmd
-   set HTTP_PROXY=http://proxy:port
-   set HTTPS_PROXY=http://proxy:port
-   pip install -r requirements.txt
+   pip install --user -r medium_publisher\requirements.txt
    ```
 
 ## Post-Installation
 
 ### Create Desktop Shortcut (Optional)
 
-1. Create a batch file `launch_medium_publisher.bat`:
-   ```cmd
-   @echo off
-   cd /d C:\path\to\medium_publisher
-   call venv\Scripts\activate
-   python main.py
-   ```
+Create a batch file `launch_medium_publisher.bat`:
+```cmd
+@echo off
+cd /d C:\path\to\workspace-root
+call venv\Scripts\activate
+python -m medium_publisher.main
+```
 
-2. Create shortcut to this batch file on desktop
+Create a shortcut to this batch file on your desktop.
 
 ### Update Application
 
-To update to a new version:
-
 ```cmd
-REM Activate virtual environment
 venv\Scripts\activate
-
-REM Pull latest code (if using git)
 git pull
-
-REM Update dependencies (use public PyPI if needed)
-pip install -r requirements.txt --upgrade --index-url https://pypi.org/simple/
-
-REM Update Playwright browsers
-playwright install chromium
+pip install -r medium_publisher\requirements.txt --upgrade --index-url https://pypi.org/simple/
 ```
 
 ### Uninstall
 
-To remove the application:
-
 ```cmd
-REM Delete application directory
-rmdir /s /q C:\path\to\medium_publisher
-
-REM Delete user data (optional)
+rmdir /s /q C:\path\to\workspace-root\venv
 rmdir /s /q %USERPROFILE%\.medium_publisher
 ```
 
 ## Next Steps
 
-1. Read the [User Guide](USER_GUIDE.md) for detailed usage instructions
-2. Review [Configuration](CONFIGURATION.md) for advanced settings
-3. Check [FAQ](FAQ.md) for common questions
+1. Read the [User Guide](USER_GUIDE_KEYBOARD_PUBLISHER.md) for detailed usage instructions
+2. Review the [Architecture](ARCHITECTURE.md) for technical details
 
 ---
 

@@ -1,391 +1,264 @@
-# Testing Checklist for Packaged Application
+# Testing Checklist for Medium Keyboard Publisher
 
-This checklist ensures the packaged Medium Article Publisher application works correctly on clean Windows machines.
+This checklist validates all features of the Medium Keyboard Publisher application.
 
 ## Pre-Testing Setup
 
 ### Test Environment
 
 - [ ] Windows 10 or Windows 11
-- [ ] No Python installed
-- [ ] No development tools installed
-- [ ] Fresh Windows installation or VM
+- [ ] Python 3.11+ installed
+- [ ] Virtual environment activated (`venv\Scripts\activate` from workspace root)
+- [ ] All dependencies installed (`pip install -r medium_publisher/requirements.txt`)
 - [ ] Internet connection available
-- [ ] At least 1GB free disk space
+- [ ] Browser (Chrome or Edge) installed
+- [ ] Display scaling noted (100%, 125%, 150%)
+- [ ] Medium account available for testing
 
 ### Test Files
 
-- [ ] Sample markdown files prepared
+- [ ] Sample markdown files prepared (with frontmatter)
 - [ ] Test Medium account credentials
 - [ ] Google account for OAuth testing (if applicable)
-
-## Installation Testing
-
-### Standalone Executable
-
-- [ ] Copy `dist\` directory to test machine
-- [ ] Verify all files present
-- [ ] Check file sizes are reasonable
-- [ ] No missing DLLs or dependencies
-
-### Installer Testing
-
-- [ ] Run installer as administrator
-- [ ] Verify installation directory created
-- [ ] Check Start menu shortcuts created
-- [ ] Verify desktop shortcut (if selected)
-- [ ] Check configuration files copied
-- [ ] Verify documentation included
 
 ## Application Launch
 
 ### First Launch
 
-- [ ] Application starts without errors
-- [ ] No console window appears (GUI mode)
+- [ ] Run `python -m medium_publisher.main` from workspace root
 - [ ] Main window displays correctly
 - [ ] All UI elements visible
-- [ ] No missing icons or images
 - [ ] Status bar shows "Ready"
+- [ ] Window stays on top (if "Always on top" is checked)
+- [ ] No import errors in console
 
 ### Configuration
 
 - [ ] Default configuration loads
 - [ ] Settings dialog opens
 - [ ] All settings display correctly
-- [ ] Settings can be modified
+- [ ] Settings can be modified and saved
 - [ ] Settings persist after restart
 
-## Playwright Setup
+## Screen Recognition
 
-### Browser Installation
+### Reference Image Detection
 
-- [ ] Run `setup_playwright.cmd`
-- [ ] Chromium downloads successfully
-- [ ] Installation completes without errors
-- [ ] Browser files created in correct location
-- [ ] No permission errors
+- [ ] Reference images exist in `medium_publisher/assets/medium/`
+- [ ] Images match current display scaling
+- [ ] `pyautogui.locateOnScreen()` finds test image on screen
+- [ ] Confidence threshold (default 0.8) works for your display
+- [ ] Lower confidence (0.6-0.7) finds elements that default misses
+- [ ] Higher confidence (0.9) avoids false matches
 
-### Browser Verification
+### Multi-Monitor
 
-- [ ] Application can launch browser
-- [ ] Browser window appears
-- [ ] Navigation works
-- [ ] No browser errors in logs
+- [ ] App works with browser on primary monitor
+- [ ] App works with browser on secondary monitor (if applicable)
+- [ ] No coordinate offset issues between monitors
 
-## Core Functionality
+### Display Scaling
 
-### File Selection
+- [ ] Works at 100% scaling
+- [ ] Works at 150% scaling (or recaptured images match)
+- [ ] No misclicks due to DPI mismatch
 
-- [ ] File selection dialog opens
-- [ ] Can browse directories
-- [ ] Can select .md files
-- [ ] Invalid files rejected
-- [ ] Selected file path displays
-- [ ] Last directory remembered
+## OS-Level Typing
 
-### Article Parsing
+### Basic Typing
 
-- [ ] Markdown file parses correctly
-- [ ] Frontmatter extracted
-- [ ] Title displays
-- [ ] Subtitle displays
-- [ ] Tags display
-- [ ] Character count accurate
-- [ ] Estimated time calculated
+- [ ] Characters appear in focused text field
+- [ ] Typing speed matches configured `base_delay_ms`
+- [ ] Speed variation is noticeable (not perfectly uniform)
+- [ ] Special characters type correctly (punctuation, symbols)
+- [ ] Newlines (Enter key) work
 
-### Authentication
+### Keyboard Shortcuts
 
-#### Email/Password Login
+- [ ] Ctrl+B applies bold in Medium editor
+- [ ] Ctrl+I applies italic in Medium editor
+- [ ] Ctrl+Alt+1 applies Header format
+- [ ] Ctrl+Alt+2 applies Subheader format
+- [ ] Ctrl+K opens link dialog
+- [ ] Ctrl+Enter inserts separator
 
-- [ ] Login dialog appears
-- [ ] Can enter credentials
-- [ ] Login succeeds with valid credentials
-- [ ] Login fails with invalid credentials
-- [ ] Error messages display
-- [ ] Session cookies saved
-- [ ] Remember me works
-- [ ] Can logout
+### Text Selection
 
-#### Google OAuth Login
+- [ ] Shift+Left selects text backwards (for formatting)
+- [ ] Selected text receives formatting correctly
+- [ ] Selection count matches text length
 
-- [ ] OAuth flow initiates
-- [ ] Browser opens to Google login
-- [ ] Can complete Google authentication
-- [ ] 2FA works (if enabled)
-- [ ] Security keys work (if enabled)
-- [ ] Login detected successfully
-- [ ] Session cookies saved
-- [ ] Session restored on restart
+## Emergency Stop
 
-### Publishing Workflow
+### Hotkey Stop
 
-#### Single Article
+- [ ] Press Ctrl+Shift+Escape during typing
+- [ ] Typing stops immediately (within 100ms)
+- [ ] Status shows "EMERGENCY STOP"
+- [ ] All held modifier keys released
 
-- [ ] Publish button enabled after file selection
-- [ ] Confirmation dialog shows estimated time
-- [ ] Progress bar updates
-- [ ] Status messages display
-- [ ] Browser navigates to Medium
-- [ ] Title typed correctly
-- [ ] Content typed with formatting
-- [ ] Bold formatting applied
-- [ ] Italic formatting applied
-- [ ] Headers applied (H2, H3)
-- [ ] Code blocks inserted
-- [ ] Links inserted
-- [ ] Placeholders for tables/images
-- [ ] Tags added
-- [ ] Subtitle added
-- [ ] Preview pause works
-- [ ] Can publish as draft
-- [ ] Can publish as public
-- [ ] Success message displays
-- [ ] Draft URL shown
+### Mouse Corner Stop
 
-#### Version Updates
+- [ ] Move mouse to screen corner during typing
+- [ ] Typing stops immediately
 
-- [ ] Version selector displays (v1-v5)
-- [ ] Change instructions input works
-- [ ] Can apply version changes
-- [ ] Sections identified correctly
-- [ ] Content replaced correctly
-- [ ] New content added correctly
-- [ ] Deleted content removed
-- [ ] Multiple versions work (v1 → v2 → v3)
-- [ ] Session maintained across versions
+### UI Button Stop
 
-#### Batch Publishing
+- [ ] Click red "Emergency Stop" button
+- [ ] Typing stops, status updates
 
-- [ ] Can select multiple files
-- [ ] Batch info displays
-- [ ] Total time estimated
-- [ ] Confirmation shows all files
-- [ ] Articles publish sequentially
-- [ ] Progress shows current article
-- [ ] Continue on error works
-- [ ] Summary report displays
-- [ ] Success/failure counts correct
+### Key Release on Stop
 
-### Rate Limiting
+- [ ] After emergency stop, no keys remain stuck
+- [ ] Can type normally in other applications after stop
+- [ ] Ctrl, Shift, Alt all released properly
 
-- [ ] Typing speed configurable
-- [ ] Rate limit enforced (35 chars/min)
-- [ ] Time estimates accurate
-- [ ] No rate limit errors
-- [ ] Sliding window works correctly
+## Focus Detection
 
-### Human Typing Simulation
+### Focus Lost
 
-- [ ] Typos generated (if enabled)
-- [ ] Typos corrected automatically
-- [ ] Typing speed varies
-- [ ] Thinking pauses occur
+- [ ] Start typing, then click a different window
+- [ ] Typing pauses automatically
+- [ ] Status shows focus lost notification
+
+### Focus Restored
+
+- [ ] Click back on the browser window
+- [ ] Typing resumes (or prompts to resume)
+
+### Focus During Formatting
+
+- [ ] Focus check happens before every keystroke
+- [ ] No partial formatting applied when focus lost mid-operation
+
+## Human Typing Simulation
+
+### Typo Generation
+
+- [ ] Set typo frequency to "medium" (5%)
+- [ ] Typos appear during typing (wrong adjacent keys)
+- [ ] Immediate corrections: wrong char → 1-3 more chars → backspace → correct
+- [ ] Deferred corrections: wrong char stays, fixed in review pass
+
+### Review Pass
+
+- [ ] After all content typed, app goes to top (Ctrl+Home)
+- [ ] Uses Ctrl+F to find each deferred typo
+- [ ] Fixes each typo by selecting and retyping
+
+### Protected Content
+
 - [ ] No typos in code blocks
 - [ ] No typos in URLs
-- [ ] Overhead calculated correctly
+- [ ] No typos in placeholder text
+- [ ] No typos in formatting markers (backticks, etc.)
 
-## Error Handling
+### Thinking Pauses
 
-### Network Errors
+- [ ] Brief pauses occur occasionally during typing
+- [ ] Pauses feel natural (100-500ms range)
 
-- [ ] Handles network disconnection
-- [ ] Waits for reconnection
-- [ ] Resumes after reconnection
-- [ ] Error messages clear
+## Content Formatting
 
-### Browser Errors
+### Headers
 
-- [ ] Handles browser crash
-- [ ] Can retry operations
-- [ ] Cleanup works correctly
-- [ ] No zombie processes
+- [ ] `##` headers get Ctrl+Alt+1 (Medium Header)
+- [ ] `###` headers get Ctrl+Alt+2 (Medium Subheader)
 
-### Content Errors
+### Inline Formatting
 
-- [ ] Validates markdown content
-- [ ] Handles malformed files
-- [ ] Validates frontmatter
-- [ ] Error messages helpful
+- [ ] Bold text: typed, selected backwards, Ctrl+B applied
+- [ ] Italic text: typed, selected backwards, Ctrl+I applied
+- [ ] Inline code: wrapped in backtick characters
+- [ ] Links: text typed, selected, Ctrl+K, URL typed, Enter
 
-### Authentication Errors
+### Block Elements
 
-- [ ] Handles invalid credentials
-- [ ] Handles expired sessions
-- [ ] Handles OAuth timeout
-- [ ] Can re-authenticate
+- [ ] Code blocks: triple backticks, content (no typos), exit
+- [ ] Bullet lists: `* ` prefix triggers Medium list
+- [ ] Numbered lists: `1. ` prefix triggers Medium list
+- [ ] Block quotes: Ctrl+Alt+5 applied
+- [ ] Separators: Ctrl+Enter pressed
+
+### Placeholders
+
+- [ ] Images: `[image: alt text]` typed as plain text
+- [ ] Tables: `[table: ...]` typed as plain text
+- [ ] No formatting or typos in placeholders
+
+## Batch Publishing
+
+### Sequential Processing
+
+- [ ] Select multiple files via "Select Batch"
+- [ ] Articles typed one after another
+- [ ] Progress shows "Article 1 of 3", etc.
+
+### Error Handling
+
+- [ ] Invalid file in batch is skipped
+- [ ] Next article continues normally
+- [ ] Completion summary shows success/failure counts
+
+## Version Updates
+
+### Find and Replace
+
+- [ ] Ctrl+F opens browser find dialog
+- [ ] Search text typed correctly (no typos)
+- [ ] Section located in editor
+- [ ] Old content selected and deleted
+- [ ] New content typed with formatting
+
+### Change Instructions
+
+- [ ] Replace instructions work
+- [ ] Add instructions work
+- [ ] Delete instructions work
+- [ ] Multiple instructions processed sequentially
+
+## Progress Display
+
+- [ ] Progress bar advances per block
+- [ ] Block counter shows "Block: N / Total"
+- [ ] Elapsed time counter runs
+- [ ] Remaining time estimate updates
 
 ## Logging
 
-### Log Display
+- [ ] Log file created at `~/.medium_publisher/logs/`
+- [ ] State transitions logged
+- [ ] Errors logged with context
+- [ ] Emergency stops logged
 
-- [ ] Logs display in UI
-- [ ] Color coding works
-- [ ] Auto-scroll works
-- [ ] Can clear logs
-- [ ] Max lines enforced
+## Error Handling
 
-### Log Files
+### Crash Recovery
 
-- [ ] Log files created
-- [ ] Logs written correctly
-- [ ] Log rotation works
-- [ ] No permission errors
+- [ ] Force-kill app during typing (Task Manager)
+- [ ] No modifier keys remain stuck (atexit hook)
+- [ ] App restarts cleanly
 
-## Session Management
+### Content Errors
 
-### State Persistence
-
-- [ ] Session state saved
-- [ ] Session restored on restart
-- [ ] Version tracking works
-- [ ] Progress tracking works
-- [ ] Can clear session
-
-### Cookies
-
-- [ ] Cookies saved correctly
-- [ ] Cookies restored correctly
-- [ ] Cookies cleared on logout
-- [ ] No cookie errors
-
-## UI Testing
-
-### Main Window
-
-- [ ] Window resizable
-- [ ] Window position remembered
-- [ ] All buttons work
-- [ ] All inputs work
-- [ ] Keyboard shortcuts work
-- [ ] Tab order correct
-
-### Settings Dialog
-
-- [ ] Opens correctly
-- [ ] All settings editable
-- [ ] Save button works
-- [ ] Cancel button works
-- [ ] Changes persist
-
-### Progress Widget
-
-- [ ] Progress bar updates
-- [ ] Status messages update
-- [ ] Time estimates update
-- [ ] Cancel button works
-- [ ] Elapsed time accurate
-- [ ] Remaining time accurate
-
-### File Selector
-
-- [ ] Dialog opens
-- [ ] File filtering works
-- [ ] Directory navigation works
-- [ ] Selection works
-- [ ] Cancel works
-
-## Performance
-
-### Startup Time
-
-- [ ] Application starts in < 5 seconds
-- [ ] No long delays
-- [ ] Responsive immediately
-
-### Memory Usage
-
-- [ ] Memory usage reasonable (< 500MB)
-- [ ] No memory leaks
-- [ ] Stable over time
-
-### CPU Usage
-
-- [ ] CPU usage reasonable
-- [ ] No excessive CPU usage
-- [ ] Responsive during typing
-
-## Cleanup and Uninstall
-
-### Application Cleanup
-
-- [ ] Can close application cleanly
-- [ ] No processes left running
-- [ ] No temporary files left
-- [ ] Logs cleaned up (if configured)
-
-### Uninstaller (If Using Installer)
-
-- [ ] Uninstaller runs
-- [ ] Application files removed
-- [ ] Start menu shortcuts removed
-- [ ] Desktop shortcut removed
-- [ ] User data handling correct
-- [ ] Registry entries cleaned (if any)
-
-## Documentation
-
-### Included Documentation
-
-- [ ] README present
-- [ ] Installation instructions clear
-- [ ] Usage guide helpful
-- [ ] Troubleshooting guide useful
-- [ ] API documentation accessible
-
-### Help System
-
-- [ ] Help menu works (if implemented)
-- [ ] Documentation opens correctly
-- [ ] Links work
-
-## Security
-
-### Credentials
-
-- [ ] Credentials stored securely
-- [ ] No plaintext passwords
-- [ ] Keyring integration works
-- [ ] Credentials cleared on logout
-
-### Network Security
-
-- [ ] HTTPS used for all connections
-- [ ] Certificates validated
-- [ ] No security warnings
+- [ ] Malformed markdown shows error message
+- [ ] Missing frontmatter shows error message
+- [ ] Empty file handled gracefully
 
 ## Edge Cases
 
-### Unusual Scenarios
-
-- [ ] Very large articles (> 10,000 words)
-- [ ] Articles with special characters
-- [ ] Articles with unicode
-- [ ] Empty articles
-- [ ] Articles with only frontmatter
-- [ ] Multiple simultaneous instances
-- [ ] Rapid button clicking
-- [ ] Canceling operations
-- [ ] Closing during operations
+- [ ] Very long article (10,000+ words) — no issues
+- [ ] Article with emoji and unicode — typed correctly
+- [ ] Mixed formatting in one paragraph — applied correctly
+- [ ] Article with only code blocks — no typos introduced
+- [ ] Rapid emergency stop during formatting shortcut — keys released
 
 ## Final Verification
 
-### Overall Quality
-
-- [ ] No crashes during testing
-- [ ] No data loss
-- [ ] No corruption
-- [ ] Performance acceptable
-- [ ] User experience smooth
-- [ ] Error messages helpful
-- [ ] Documentation accurate
-
-### Sign-Off
-
-- [ ] All critical tests passed
-- [ ] All high-priority tests passed
-- [ ] Known issues documented
-- [ ] Ready for release
+- [ ] No crashes during full test session
+- [ ] No data loss or corruption
+- [ ] Performance acceptable at configured speed
+- [ ] All critical features work end-to-end
 
 ---
 
@@ -393,6 +266,6 @@ This checklist ensures the packaged Medium Article Publisher application works c
 **Test Date**: _______________
 **Application Version**: _______________
 **Windows Version**: _______________
-**Test Environment**: _______________
+**Display Scaling**: _______________
 
 **Notes**:
